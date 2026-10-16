@@ -41,7 +41,7 @@ export function Paywall() {
         <View style={[st.sheet, { backgroundColor: c.bg, paddingBottom: insets.bottom + 16 }]}>
           <ScrollView contentContainerStyle={{ gap: 14, padding: 20 }}>
             <View style={{ gap: 4 }}>
-              <Text style={[st.eyebrow, { color: c.brass }]}>{paywall ? `${paywall} is a Pro feature` : 'Upgrade'}</Text>
+              <Text style={[st.eyebrow, { color: c.brassText }]}>{paywall ? `${paywall} is a Pro feature` : 'Upgrade'}</Text>
               <Text style={[st.title, { color: c.ink }]}>Tip or Skip Pro</Text>
               <Body muted>One payment of {PRO_PRICE}. No subscription.</Body>
             </View>

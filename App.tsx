@@ -60,7 +60,7 @@ function Main() {
         <View>
           <Text style={[st.tag, { color: c.muted }]}>Should I tip for this?</Text>
           <Text style={[st.brand, { color: c.ink }]}>
-            Tip <Text style={{ color: c.brass }}>or</Text> Skip
+            Tip <Text style={{ color: c.brassText }}>or</Text> Skip
           </Text>
         </View>
 

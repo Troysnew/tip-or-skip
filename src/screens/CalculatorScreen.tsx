@@ -271,7 +271,7 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
                 <Text style={{ color: c.muted, fontSize: 13 }}>{money(itemResult.unassigned)} isn't assigned to anyone, so it's split evenly.</Text>
               )}
               {itemResult.over > 0.004 && (
-                <Text style={{ color: c.no, fontSize: 13 }}>The amounts add up to {money(itemResult.over)} more than the bill before tax. Check them.</Text>
+                <Text style={{ color: c.warn, fontSize: 13 }}>The amounts add up to {money(itemResult.over)} more than the bill before tax. Check them.</Text>
               )}
               {Math.abs(itemResult.collected - itemResult.total) > 0.004 && (
                 <Text style={{ color: c.muted, fontSize: 13 }}>Shares are rounded up to the cent, so the group covers {money(itemResult.collected)}.</Text>

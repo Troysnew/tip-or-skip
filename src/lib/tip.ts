@@ -1,5 +1,4 @@
 import type { Service } from '../data/services';
-import { PEW_PICK } from '../data/surveys';
 
 export type RoundMode = 'none' | 'tip' | 'total';
 export type TipBase = 'pre' | 'post';
@@ -123,11 +122,14 @@ export function tipOptions(s: Service): number[] {
   return a;
 }
 
+/**
+ * Short label under a tip button. "Suggested" marks the app's recommendation and is separate from
+ * the selected state. Survey figures stay in the service details, next to their source and date.
+ */
 export function optionLabel(s: Service, v: number) {
-  if (v === 0) return 'Skip';
-  if (s.id === 'restaurant' && PEW_PICK[v]) return `${PEW_PICK[v]}% pick this`;
+  if (v === 0) return 'No tip';
   const [lo, hi, def] = (s.flat ?? s.pct)!;
-  if (v === def) return 'Typical';
+  if (v === def) return 'Suggested';
   if (v === hi) return 'Great service';
   if (v === lo) return 'Basic';
   return '';

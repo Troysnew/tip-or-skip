@@ -131,9 +131,9 @@ export function TipButtons({ options, selected, onSelect }: { options: TipOption
             key={o.value}
             onPress={() => onSelect(o.value)}
             accessibilityState={{ selected: on }}
-            style={[s.tipBtn, { borderColor: on ? c.ink : o.recommended ? c.brass : c.line, backgroundColor: on ? c.ink : c.bg }]}
+            style={[s.tipBtn, { borderColor: on ? c.ink : o.recommended ? c.brass : c.line, borderWidth: on ? 2.5 : 1.5, backgroundColor: on ? c.ink : c.bg }]}
           >
-            <Text style={{ color: on ? c.bg : c.muted, fontSize: 12, fontWeight: '700' }}>{o.top}</Text>
+            <Text style={{ color: on ? c.bg : c.muted, fontSize: 12, fontWeight: '700' }}>{on ? `✓ ${o.top}` : o.top}</Text>
             <Text style={{ color: fg, fontFamily: mono, fontWeight: '700', fontSize: 18 }}>{o.amount}</Text>
             <Text style={{ color: on ? c.bg : c.muted, fontSize: 11, minHeight: 15 }}>{o.sub}</Text>
           </Pressable>
@@ -161,7 +161,7 @@ export function ProTag() {
   const c = useColors();
   return (
     <View style={[s.proTag, { borderColor: c.brass }]}>
-      <Text style={{ color: c.brass, fontSize: 10, fontWeight: '800', letterSpacing: 0.6 }}>PRO</Text>
+      <Text style={{ color: c.brassText, fontSize: 10, fontWeight: '800', letterSpacing: 0.6 }}>PRO</Text>
     </View>
   );
 }
