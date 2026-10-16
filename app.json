@@ -8,7 +8,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.troyharris.tiporskip",
+      "bundleIdentifier": "com.troyharris.tiporskip.app",
       "config": {
         "usesNonExemptEncryption": false
       }
