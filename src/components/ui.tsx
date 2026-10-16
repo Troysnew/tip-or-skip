@@ -1,0 +1,198 @@
+import React from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
+import { VERDICT_TEXT, type Service, type Verdict } from '../data/services';
+import { normLabel } from '../lib/tip';
+import { mono, useColors, verdictColors } from '../theme';
+
+export function Card({ children, style }: { children: React.ReactNode; style?: StyleProp<ViewStyle> }) {
+  const c = useColors();
+  return <View style={[s.card, { backgroundColor: c.surface, borderColor: c.line }, style]}>{children}</View>;
+}
+
+export function H2({ children }: { children: React.ReactNode }) {
+  const c = useColors();
+  return <Text style={[s.h2, { color: c.ink }]}>{children}</Text>;
+}
+
+export function H3({ children }: { children: React.ReactNode }) {
+  const c = useColors();
+  return <Text style={[s.h3, { color: c.ink }]}>{children}</Text>;
+}
+
+export function Body({ children, muted, small }: { children: React.ReactNode; muted?: boolean; small?: boolean }) {
+  const c = useColors();
+  return <Text style={{ color: muted ? c.muted : c.ink, fontSize: small ? 13 : 15, lineHeight: small ? 18 : 21 }}>{children}</Text>;
+}
+
+export function Label({ children }: { children: React.ReactNode }) {
+  const c = useColors();
+  return <Text style={[s.label, { color: c.muted }]}>{children}</Text>;
+}
+
+export function Pill({ verdict, long }: { verdict: Verdict; long?: boolean }) {
+  const c = useColors();
+  const vc = verdictColors(c, verdict);
+  return (
+    <View style={[s.pill, { backgroundColor: vc.bg }]}>
+      <View style={[s.dot, { backgroundColor: vc.fg }]} />
+      <Text style={[s.pillText, { color: vc.fg }]}>{long ? VERDICT_TEXT[verdict].answer : VERDICT_TEXT[verdict].short}</Text>
+    </View>
+  );
+}
+
+export function Btn({ title, onPress, ghost, small }: { title: string; onPress: () => void; ghost?: boolean; small?: boolean }) {
+  const c = useColors();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [
+        s.btn,
+        small && { paddingVertical: 8, paddingHorizontal: 12 },
+        ghost ? { borderWidth: 1.5, borderColor: c.accent } : { backgroundColor: c.accent },
+        pressed && { opacity: 0.7 },
+      ]}
+    >
+      <Text style={{ color: ghost ? c.accent : c.accentInk, fontWeight: '700', fontSize: small ? 13 : 15 }}>{title}</Text>
+    </Pressable>
+  );
+}
+
+export function MoneyField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const c = useColors();
+  return (
+    <View style={{ flex: 1, minWidth: 0 }}>
+      <Label>{label}</Label>
+      <View style={[s.money, { borderColor: c.line, backgroundColor: c.bg }]}>
+        <Text style={{ color: c.muted, fontFamily: mono }}>$</Text>
+        <TextInput
+          value={value}
+          onChangeText={(t) => onChange(t.replace(/[^0-9.]/g, ''))}
+          keyboardType="decimal-pad"
+          placeholder={placeholder ?? '0.00'}
+          placeholderTextColor={c.muted}
+          style={[s.moneyInput, { color: c.ink }]}
+          accessibilityLabel={label}
+        />
+      </View>
+    </View>
+  );
+}
+
+export function Stepper({ label, value, onChange, min = 1, max = 99, suffix = '' }: { label: string; value: number; onChange: (v: number) => void; min?: number; max?: number; suffix?: string }) {
+  const c = useColors();
+  const btn = (txt: string, next: number, a11y: string) => (
+    <Pressable accessibilityLabel={a11y} onPress={() => onChange(Math.min(max, Math.max(min, next)))} style={({ pressed }) => [s.stepBtn, { borderColor: c.line }, pressed && { opacity: 0.6 }]}>
+      <Text style={{ color: c.ink, fontSize: 20, fontWeight: '700' }}>{txt}</Text>
+    </Pressable>
+  );
+  return (
+    <View style={{ flex: 1 }}>
+      <Label>{label}</Label>
+      <View style={s.stepper}>
+        {btn('−', value - 1, `Decrease ${label}`)}
+        <Text style={[s.stepVal, { color: c.ink }]}>{value}{suffix}</Text>
+        {btn('+', value + 1, `Increase ${label}`)}
+      </View>
+    </View>
+  );
+}
+
+export function Segmented<T extends string>({ label, options, value, onChange }: { label: string; options: { v: T; t: string }[]; value: T; onChange: (v: T) => void }) {
+  const c = useColors();
+  return (
+    <View style={{ flex: 1 }}>
+      <Label>{label}</Label>
+      <View style={[s.seg, { backgroundColor: c.sunk }]}>
+        {options.map((o) => {
+          const on = o.v === value;
+          return (
+            <Pressable key={o.v} onPress={() => onChange(o.v)} accessibilityState={{ selected: on }} style={[s.segBtn, on && { backgroundColor: c.surface }]}>
+              <Text style={{ color: on ? c.ink : c.muted, fontWeight: '600', fontSize: 13 }}>{o.t}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+export interface TipOption { value: number; top: string; amount: string; sub: string; recommended: boolean }
+
+export function TipButtons({ options, selected, onSelect }: { options: TipOption[]; selected: number | null; onSelect: (v: number) => void }) {
+  const c = useColors();
+  return (
+    <View style={s.tipRow}>
+      {options.map((o) => {
+        const on = o.value === selected;
+        const fg = on ? c.bg : c.ink;
+        return (
+          <Pressable
+            key={o.value}
+            onPress={() => onSelect(o.value)}
+            accessibilityState={{ selected: on }}
+            style={[s.tipBtn, { borderColor: on ? c.ink : o.recommended ? c.brass : c.line, backgroundColor: on ? c.ink : c.bg }]}
+          >
+            <Text style={{ color: on ? c.bg : c.muted, fontSize: 12, fontWeight: '700' }}>{o.top}</Text>
+            <Text style={{ color: fg, fontFamily: mono, fontWeight: '700', fontSize: 18 }}>{o.amount}</Text>
+            <Text style={{ color: on ? c.bg : c.muted, fontSize: 11, minHeight: 15 }}>{o.sub}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+export function ServiceRow({ s: svc, onPress, last }: { s: Service; onPress: () => void; last?: boolean }) {
+  const c = useColors();
+  return (
+    <Pressable onPress={onPress} style={({ pressed }) => [s.row, !last && { borderBottomWidth: 1, borderBottomColor: c.line }, pressed && { backgroundColor: c.sunk }]}>
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={{ color: c.ink, fontWeight: '600', fontSize: 15 }}>{svc.name}</Text>
+        <Text style={{ color: c.muted, fontFamily: mono, fontSize: 12 }}>{normLabel(svc)}</Text>
+      </View>
+      <Pill verdict={svc.verdict} />
+    </Pressable>
+  );
+}
+
+export function Bars({ rows, max }: { rows: [string, number][]; max: number }) {
+  const c = useColors();
+  const top = Math.max(...rows.map((r) => r[1]));
+  return (
+    <View style={{ gap: 7 }}>
+      {rows.map(([k, v]) => (
+        <View key={k} style={s.bar}>
+          <Text style={{ color: c.muted, fontSize: 13, width: 100 }}>{k}</Text>
+          <View style={[s.track, { backgroundColor: c.sunk }]}>
+            <View style={{ width: `${Math.min(100, (v / max) * 100)}%`, height: '100%', borderRadius: 6, backgroundColor: v === top ? c.brass : c.accent }} />
+          </View>
+          <Text style={{ color: c.ink, fontFamily: mono, fontWeight: '700', fontSize: 13, width: 40, textAlign: 'right' }}>{v}%</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const s = StyleSheet.create({
+  card: { borderWidth: 1, borderRadius: 14, padding: 16, gap: 10 },
+  h2: { fontSize: 22, fontWeight: '800', letterSpacing: -0.3 },
+  h3: { fontSize: 16, fontWeight: '700' },
+  label: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
+  pill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99, alignSelf: 'center' },
+  dot: { width: 7, height: 7, borderRadius: 4 },
+  pillText: { fontSize: 12, fontWeight: '700' },
+  btn: { borderRadius: 12, paddingVertical: 13, paddingHorizontal: 16, alignItems: 'center', justifyContent: 'center' },
+  money: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: 12, paddingHorizontal: 12 },
+  moneyInput: { flex: 1, paddingVertical: 10, paddingHorizontal: 6, fontFamily: mono, fontSize: 19, fontWeight: '700' },
+  stepper: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  stepBtn: { width: 40, height: 40, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  stepVal: { fontFamily: mono, fontWeight: '700', fontSize: 18, minWidth: 34, textAlign: 'center' },
+  seg: { flexDirection: 'row', borderRadius: 10, padding: 3, gap: 3 },
+  segBtn: { flex: 1, paddingVertical: 8, borderRadius: 8, alignItems: 'center' },
+  tipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  tipBtn: { flexGrow: 1, flexBasis: 88, borderWidth: 1.5, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 4, alignItems: 'center', gap: 2 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 13, paddingHorizontal: 16 },
+  bar: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  track: { flex: 1, height: 12, borderRadius: 6, overflow: 'hidden' },
+});
