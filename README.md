@@ -77,7 +77,21 @@ On Windows, if a firewall prompt asks whether to allow Node.js, allow it. Otherw
 
 ---
 
-## Part 2: Build an APK you can install and share
+## Automatic APK builds with GitHub (no computer needed)
+
+When this project lives in a GitHub repository, `.github/workflows/android-apk.yml` builds a fresh APK every time code is pushed to the `main` branch. Each build appears under the repository's **Releases** with `tip-or-skip.apk` attached. The newest build is always at:
+
+```
+https://github.com/<owner>/<repo>/releases/latest/download/tip-or-skip.apk
+```
+
+Open that link on an Android phone to download and install it. A build takes roughly 10 to 20 minutes after a push. You can also start one by hand from the repository's **Actions** tab ("Build Android APK", then "Run workflow").
+
+These APKs are signed with the standard Android debug key, so each new build installs over the previous one. Publishing to Google Play later needs a proper upload key (EAS can manage that).
+
+---
+
+## Part 2: Build an APK you can install and share (EAS, from a computer)
 
 An APK is a standalone Android app file. Anyone with an Android phone can install it without Expo Go or a computer. Expo builds it in their cloud for free, so you don't need Android Studio. You only need the terminal from Part 1.
 

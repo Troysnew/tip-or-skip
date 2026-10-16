@@ -45,6 +45,52 @@ export function computeFlat(amount: number, qty: number, round: RoundMode, split
   return { tip, each };
 }
 
+export interface ItemizedInput {
+  bill: number;
+  tax: number;
+  base: TipBase;
+  pct: number;
+  round: RoundMode;
+  people: { name: string; amount: number }[];
+  shared: number;
+}
+
+export interface ItemizedShare {
+  name: string;
+  food: number;
+  tax: number;
+  tip: number;
+  total: number;
+}
+
+/**
+ * Split a check by what each person ordered.
+ * Shared items, and any part of the pre-tax subtotal nobody claimed, are split evenly.
+ * Tax and tip are divided in proportion to each person's food.
+ */
+export function computeItemized(i: ItemizedInput) {
+  const n = Math.max(1, i.people.length);
+  const tax = Math.min(i.tax, i.bill || Infinity);
+  const claimed = i.people.reduce((a, p) => a + p.amount, 0) + i.shared;
+  const subtotal = i.bill > 0 ? i.bill - tax : claimed;
+  const unassigned = Math.max(0, subtotal - claimed);
+  const over = Math.max(0, claimed - subtotal);
+  const evenPart = (i.shared + unassigned) / n;
+  const foods = i.people.map((p) => p.amount + evenPart);
+  const foodSum = foods.reduce((a, b) => a + b, 0);
+  const billUsed = i.bill > 0 ? i.bill : claimed + tax;
+  const whole = computePct({ bill: billUsed, tax, base: i.base, pct: i.pct, round: i.round, split: 1 });
+  const shares: ItemizedShare[] = i.people.map((p, k) => {
+    const w = foodSum > 0 ? foods[k] / foodSum : 1 / n;
+    const t = tax * w;
+    const tip = whole.tip * w;
+    const total = Math.ceil((foods[k] + t + tip) * 100 - 1e-9) / 100;
+    return { name: p.name, food: foods[k], tax: t, tip, total };
+  });
+  const collected = shares.reduce((a, s) => a + s.total, 0);
+  return { shares, unassigned, over, tip: whole.tip, total: whole.total, collected };
+}
+
 /** Short norm text such as "15–20% of the bill" or "$2–$5 per night". */
 export function normLabel(s: Service) {
   if (s.verdict === 'not') return 'No tip';

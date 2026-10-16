@@ -156,6 +156,41 @@ export function ServiceRow({ s: svc, onPress, last }: { s: Service; onPress: () 
   );
 }
 
+/** Small "PRO" badge shown next to locked features. */
+export function ProTag() {
+  const c = useColors();
+  return (
+    <View style={[s.proTag, { borderColor: c.brass }]}>
+      <Text style={{ color: c.brass, fontSize: 10, fontWeight: '800', letterSpacing: 0.6 }}>PRO</Text>
+    </View>
+  );
+}
+
+export function Chip({ label, onPress, onLongPress, active, locked }: { label: string; onPress: () => void; onLongPress?: () => void; active?: boolean; locked?: boolean }) {
+  const c = useColors();
+  return (
+    <Pressable
+      onPress={onPress}
+      onLongPress={onLongPress}
+      accessibilityRole="button"
+      style={({ pressed }) => [s.chip, { borderColor: active ? c.ink : c.line, backgroundColor: active ? c.ink : 'transparent' }, pressed && { opacity: 0.7 }]}
+    >
+      <Text style={{ color: active ? c.bg : c.ink, fontWeight: '600', fontSize: 13 }}>{label}</Text>
+      {locked && <ProTag />}
+    </Pressable>
+  );
+}
+
+export function Checkbox({ checked, onToggle, label }: { checked: boolean; onToggle: () => void; label: string }) {
+  const c = useColors();
+  return (
+    <Pressable onPress={onToggle} accessibilityRole="checkbox" accessibilityState={{ checked }} accessibilityLabel={label} hitSlop={8}
+      style={[s.check, { borderColor: checked ? c.accent : c.line, backgroundColor: checked ? c.accent : 'transparent' }]}>
+      {checked && <Text style={{ color: c.accentInk, fontWeight: '900', fontSize: 14 }}>✓</Text>}
+    </Pressable>
+  );
+}
+
 export function Bars({ rows, max }: { rows: [string, number][]; max: number }) {
   const c = useColors();
   const top = Math.max(...rows.map((r) => r[1]));
@@ -195,4 +230,7 @@ const s = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 13, paddingHorizontal: 16 },
   bar: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   track: { flex: 1, height: 12, borderRadius: 6, overflow: 'hidden' },
+  proTag: { borderWidth: 1, borderRadius: 4, paddingHorizontal: 4, paddingVertical: 1 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1.5, borderRadius: 99, paddingHorizontal: 12, paddingVertical: 7 },
+  check: { width: 26, height: 26, borderRadius: 7, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
 });

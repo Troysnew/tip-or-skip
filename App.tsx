@@ -3,25 +3,32 @@ import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Service } from './src/data/services';
-import { usePersistentState } from './src/lib/storage';
 import { CalculatorScreen } from './src/screens/CalculatorScreen';
 import { DataScreen } from './src/screens/DataScreen';
+import { HistoryScreen } from './src/screens/HistoryScreen';
+import { HolidayScreen } from './src/screens/HolidayScreen';
+import { Paywall } from './src/screens/Paywall';
 import { ServicesScreen } from './src/screens/ServicesScreen';
 import { ServiceSheet } from './src/screens/ServiceSheet';
-import { initialCalc, withService, type CalcState, type Polls } from './src/state';
+import { initialCalc, withService, type CalcState } from './src/state';
+import { StoreProvider, useStore } from './src/store';
 import { useColors } from './src/theme';
 
-type Tab = 'calc' | 'services' | 'data';
+type Tab = 'calc' | 'services' | 'history' | 'holiday' | 'about';
 const TABS: { id: Tab; label: string; glyph: string }[] = [
   { id: 'calc', label: 'Calculator', glyph: '%' },
   { id: 'services', label: 'Services', glyph: '?' },
-  { id: 'data', label: 'Data', glyph: '▮' },
+  { id: 'history', label: 'History', glyph: '≡' },
+  { id: 'holiday', label: 'Holidays', glyph: '★' },
+  { id: 'about', label: 'About', glyph: 'i' },
 ];
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <Main />
+      <StoreProvider>
+        <Main />
+      </StoreProvider>
     </SafeAreaProvider>
   );
 }
@@ -29,17 +36,10 @@ export default function App() {
 function Main() {
   const c = useColors();
   const insets = useSafeAreaInsets();
+  const { toast, flash, requests, setRequests } = useStore();
   const [tab, setTab] = useState<Tab>('calc');
   const [calc, setCalc] = useState<CalcState>(initialCalc);
   const [sheetId, setSheetId] = useState<string | null>(null);
-  const [polls, setPolls] = usePersistentState<Polls>('tos.polls', {});
-  const [requests, setRequests] = usePersistentState<string[]>('tos.requests', []);
-  const [toast, setToast] = useState<string | null>(null);
-
-  const flash = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 2400);
-  };
 
   const sendToCalculator = (s: Service, choice: number, qty: number) => {
     setCalc((cur) => {
@@ -69,16 +69,18 @@ function Main() {
           <ServicesScreen
             onOpenService={setSheetId}
             onRequest={(name) => {
-              if (name && !requests.includes(name)) setRequests([...requests, name]);
+              if (name && !requests.includes(name)) setRequests((r) => [...r, name]);
               flash("Requested. We'll add it to the catalog.");
             }}
           />
         )}
-        {tab === 'data' && <DataScreen requests={requests} />}
+        {tab === 'history' && <HistoryScreen />}
+        {tab === 'holiday' && <HolidayScreen />}
+        {tab === 'about' && <DataScreen />}
       </ScrollView>
 
       {toast && (
-        <View style={[st.toast, { backgroundColor: c.ink }]} pointerEvents="none">
+        <View style={[st.toast, { backgroundColor: c.ink, bottom: 80 + insets.bottom }]} pointerEvents="none">
           <Text style={{ color: c.bg, fontWeight: '600' }}>{toast}</Text>
         </View>
       )}
@@ -89,7 +91,7 @@ function Main() {
           return (
             <Pressable key={t.id} onPress={() => setTab(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }} style={st.tab}>
               <Text style={{ color: on ? c.accent : c.muted, fontSize: 18, fontWeight: '800' }}>{t.glyph}</Text>
-              <Text style={{ color: on ? c.accent : c.muted, fontSize: 12, fontWeight: '600' }}>{t.label}</Text>
+              <Text style={{ color: on ? c.accent : c.muted, fontSize: 11, fontWeight: '600' }}>{t.label}</Text>
             </Pressable>
           );
         })}
@@ -100,10 +102,9 @@ function Main() {
         onClose={() => setSheetId(null)}
         calc={calc}
         setBill={(bill, tax) => setCalc((cur) => ({ ...cur, bill, tax }))}
-        polls={polls}
-        onVote={(id, answer) => setPolls({ ...polls, [id]: answer })}
         onSendToCalculator={sendToCalculator}
       />
+      <Paywall />
     </View>
   );
 }
@@ -114,5 +115,5 @@ const st = StyleSheet.create({
   brand: { fontSize: 32, fontWeight: '800', letterSpacing: -0.6 },
   tabs: { flexDirection: 'row', borderTopWidth: 1 },
   tab: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 10, gap: 2 },
-  toast: { position: 'absolute', alignSelf: 'center', bottom: 96, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 99 },
+  toast: { position: 'absolute', alignSelf: 'center', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 99 },
 });

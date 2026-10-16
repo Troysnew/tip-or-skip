@@ -1,6 +1,8 @@
 import React from 'react';
 import { Linking, Text, View } from 'react-native';
-import { Body, Card, H2, H3 } from '../components/ui';
+import { Body, Btn, Card, H2, H3, ProTag } from '../components/ui';
+import { PRO_PRICE, TEST_MODE } from '../pro/purchases';
+import { useStore } from '../store';
 import { useColors } from '../theme';
 
 function Link({ url, children }: { url: string; children: string }) {
@@ -12,9 +14,34 @@ function Link({ url, children }: { url: string; children: string }) {
   );
 }
 
-export function DataScreen({ requests }: { requests: string[] }) {
+export function DataScreen() {
+  const c = useColors();
+  const { pro, setPro, requests, openPaywall, flash } = useStore();
   return (
     <View style={{ gap: 12 }}>
+      <Card>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <H3>Tip or Skip Pro</H3>
+          <ProTag />
+        </View>
+        {pro ? (
+          <>
+            <Body>Pro is unlocked on this phone.</Body>
+            {TEST_MODE && (
+              <>
+                <Body muted small>Test mode: purchases aren't connected yet. Turn Pro off to see what free users see.</Body>
+                <Btn small ghost title="Turn off Pro (testing)" onPress={() => { setPro(false); flash('Pro turned off'); }} />
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <Body>Tip history, saved presets, split by item, and the holiday planner. One payment of {PRO_PRICE}.</Body>
+            <Btn small title="See Pro" onPress={() => openPaywall('')} />
+          </>
+        )}
+      </Card>
+      <Text style={{ color: c.muted, fontSize: 12 }}>Version 0.2.0</Text>
       <View style={{ gap: 4 }}>
         <H2>Where the numbers come from</H2>
         <Body muted>Stats appear only where a published survey measured that service. Everything else waits for in-app responses.</Body>

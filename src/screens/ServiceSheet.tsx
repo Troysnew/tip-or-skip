@@ -5,7 +5,8 @@ import { Bars, Body, Btn, Card, H3, MoneyField, Stepper, TipButtons, type TipOpt
 import { VERDICT_TEXT, byId, type Service } from '../data/services';
 import { BANKRATE, FREQ, PEW, PEW_AMOUNT, PEW_LABEL } from '../data/surveys';
 import { canCalculate, computePct, defaultOption, money, normLabel, optionLabel, parseAmount, tipOptions } from '../lib/tip';
-import type { CalcState, Polls } from '../state';
+import type { CalcState } from '../state';
+import { useStore } from '../store';
 import { mono, useColors, verdictColors } from '../theme';
 
 interface Props {
@@ -13,8 +14,6 @@ interface Props {
   onClose: () => void;
   calc: CalcState;
   setBill: (bill: string, tax: string) => void;
-  polls: Polls;
-  onVote: (id: string, answer: string) => void;
   onSendToCalculator: (s: Service, choice: number, qty: number) => void;
 }
 
@@ -26,8 +25,10 @@ const pollOptions = (s: Service) => {
   return ["Didn't tip", 'Under 15%', '15%', '18%', '20%', 'Over 20%'];
 };
 
-export function ServiceSheet({ serviceId, onClose, calc, setBill, polls, onVote, onSendToCalculator }: Props) {
+export function ServiceSheet({ serviceId, onClose, calc, setBill, onSendToCalculator }: Props) {
   const c = useColors();
+  const { polls, setPolls } = useStore();
+  const onVote = (id: string, answer: string) => setPolls((p) => ({ ...p, [id]: answer }));
   const insets = useSafeAreaInsets();
   const s = serviceId ? byId(serviceId) : undefined;
   const [choice, setChoice] = useState(0);
