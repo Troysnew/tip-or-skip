@@ -1,0 +1,47 @@
+# Builds the iPhone app on Expo's servers (EAS Build) and submits it to TestFlight.
+#
+# Requires a one-time interactive setup from a computer first (`npx testflight`, see README),
+# which creates the Apple signing credentials and the App Store Connect API key on EAS.
+# Then add the EXPO_TOKEN repository secret and set submit.production.ios.ascAppId in eas.json.
+#
+# Runs on demand from the Actions tab ("Build iOS for TestFlight" > "Run workflow"), because
+# iOS builds use EAS build credits and each TestFlight build may go through Apple review.
+
+name: Build iOS for TestFlight
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ios:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check setup
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::Add the EXPO_TOKEN repository secret first (see README, iPhone section)."
+            exit 1
+          fi
+          node -e "const e=require('./eas.json'); if(!e.submit?.production?.ios?.ascAppId){console.log('::error::Set submit.production.ios.ascAppId in eas.json after the first npx testflight run.'); process.exit(1)}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Build and submit to TestFlight
+        run: eas build --platform ios --profile production --non-interactive --auto-submit --no-wait

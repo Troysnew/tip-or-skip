@@ -91,6 +91,43 @@ These APKs are signed with the standard Android debug key, so each new build ins
 
 ---
 
+## iPhone: TestFlight
+
+iPhones can't install apps from a download link, so the iPhone version goes through Apple's TestFlight app. You need the Apple Developer account (already in place) and a free Expo account at expo.dev.
+
+### One-time setup (needs a computer, about 15 minutes)
+
+Apple requires one interactive sign-in so Expo can create the app's signing certificate and provisioning profile on your account. After that, builds are automated.
+
+1. On a computer with Node.js installed, get the code: on github.com/Troysnew/tip-or-skip, choose **Code** then **Download ZIP**, and extract it. (Or run `git clone https://github.com/Troysnew/tip-or-skip`.)
+2. Open a terminal in that folder (see Part 1, Step 3) and run:
+   ```
+   npm install
+   npx testflight
+   ```
+3. Follow the prompts:
+   - Sign in to your Expo account.
+   - Confirm the bundle identifier `com.tiporskip.app`.
+   - Sign in with the Apple ID on your developer account, including the two-factor code.
+   - Let it create the distribution certificate, provisioning profile, and App Store Connect API key.
+4. It creates the app in App Store Connect, builds in Expo's cloud, and uploads to TestFlight. When processing finishes, install it on your iPhone with the TestFlight app.
+
+App Store app names must be unique. If "Tip or Skip" is taken, use a variant such as "Tip or Skip: Tipping Guide". The name on the home screen stays "Tip or Skip".
+
+### After the first run: automated iPhone builds
+
+1. In App Store Connect, open the app and copy its **Apple ID** (a number shown under App Information). Put it in `eas.json` as `submit.production.ios.ascAppId`.
+2. Create a personal access token in your Expo account settings.
+3. On GitHub, in the repository's **Settings > Secrets and variables > Actions**, add a secret named `EXPO_TOKEN` with that token.
+4. From then on, the **Actions** tab's "Build iOS for TestFlight" workflow builds and submits a new version on demand.
+
+### Sharing with testers
+
+- **Internal testers** (people on your App Store Connect team) can install right away.
+- **External testers** join through a public TestFlight link, up to 10,000 people. Apple reviews the first build before external testers can install it.
+
+---
+
 ## Part 2: Build an APK you can install and share (EAS, from a computer)
 
 An APK is a standalone Android app file. Anyone with an Android phone can install it without Expo Go or a computer. Expo builds it in their cloud for free, so you don't need Android Studio. You only need the terminal from Part 1.

@@ -7,8 +7,11 @@
     "icon": "./assets/brand/app-icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.tiporskip.app"
+      "supportsTablet": false,
+      "bundleIdentifier": "com.tiporskip.app",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.tiporskip.app",
