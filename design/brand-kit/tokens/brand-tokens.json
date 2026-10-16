@@ -1,0 +1,113 @@
+{
+  "status": "Working direction A, 2026-10-16. Review assets; name not cleared; no app changes made.",
+  "light": {
+    "background": "#EEF2EE",
+    "surface": "#FFFFFF",
+    "text": "#10291F",
+    "textSecondary": "#50645A",
+    "brand": "#1F6B4A",
+    "onBrand": "#FFFFFF",
+    "brassAccent": "#C08A1E",
+    "brassText": "#855C0C",
+    "verdicts": {
+      "Yes, tip": {
+        "text": "#1F6B4A",
+        "background": "#DCEFE4"
+      },
+      "Your call": {
+        "text": "#8A5A00",
+        "background": "#F6EBCF"
+      },
+      "Skip it": {
+        "text": "#4F5963",
+        "background": "#E6EAEE"
+      },
+      "Included": {
+        "text": "#2F5574",
+        "background": "#DFE9F2"
+      }
+    },
+    "border": "#708477",
+    "focus": "#1F6B4A"
+  },
+  "dark": {
+    "background": "#0D1712",
+    "surface": "#15251C",
+    "text": "#E4EEE7",
+    "textSecondary": "#ADBFB3",
+    "brand": "#5FC495",
+    "onBrand": "#0D1712",
+    "brassAccent": "#E0AE4A",
+    "brassText": "#E0AE4A",
+    "verdicts": {
+      "Yes, tip": {
+        "text": "#7AD4A6",
+        "background": "#173B2A"
+      },
+      "Your call": {
+        "text": "#E8C26E",
+        "background": "#3A2F14"
+      },
+      "Skip it": {
+        "text": "#BBC5CE",
+        "background": "#253039"
+      },
+      "Included": {
+        "text": "#9CC3E6",
+        "background": "#1B2E40"
+      }
+    },
+    "border": "#668272",
+    "focus": "#5FC495"
+  },
+  "usage": {
+    "brassAccent": "Decorative accent or fill only in light mode; use brassText for small labels and outlines.",
+    "verdicts": "Always include a visible text label. Expand Included to Already included in the result explanation.",
+    "brand": "Theme-dependent UI action color. Launcher icon background remains #1F6B4A in both themes."
+  },
+  "typography": {
+    "display": {
+      "family": "Bricolage Grotesque",
+      "weight": [
+        600,
+        700
+      ]
+    },
+    "body": {
+      "family": "Inter",
+      "weight": [
+        400,
+        500,
+        600
+      ]
+    },
+    "amounts": {
+      "family": "JetBrains Mono",
+      "weight": [
+        500,
+        600
+      ]
+    },
+    "sizes": {
+      "screenTitle": 28,
+      "sectionTitle": 20,
+      "body": 16,
+      "label": 14,
+      "caption": 12
+    }
+  },
+  "spacing": [
+    4,
+    8,
+    12,
+    16,
+    24,
+    32,
+    48
+  ],
+  "radii": {
+    "control": 12,
+    "card": 20,
+    "pill": 999
+  }
+}

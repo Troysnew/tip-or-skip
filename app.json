@@ -2,9 +2,9 @@
   "expo": {
     "name": "Tip or Skip",
     "slug": "tip-or-skip",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/brand/app-icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
@@ -14,10 +14,9 @@
       "package": "com.tiporskip.app",
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
+        "foregroundImage": "./assets/brand/adaptive-foreground.png",
         "backgroundColor": "#1F6B4A",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "monochromeImage": "./assets/brand/monochrome.png"
       },
       "predictiveBackGestureEnabled": false
     },
@@ -29,15 +28,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
-          "imageWidth": 160,
-          "backgroundColor": "#1F6B4A",
-          "dark": {
-            "image": "./assets/splash-icon.png",
-            "backgroundColor": "#0D1712"
-          }
+          "image": "./assets/brand/splash.png",
+          "imageWidth": 220,
+          "backgroundColor": "#1F6B4A"
         }
       ]
-    ]
+    ],
+    "primaryColor": "#1F6B4A"
   }
 }

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { FONT_FILES } from './src/fonts';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from './src/components/Text';
-import { TabIcon, type IconName } from './src/components/icons';
+import { Icon, type IconName } from './src/components/icons';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Service } from './src/data/services';
 import { CalculatorScreen } from './src/screens/CalculatorScreen';
@@ -21,10 +21,10 @@ import { useColors } from './src/theme';
 
 type Tab = 'calc' | 'services' | 'history' | 'holiday' | 'about';
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
-  { id: 'calc', label: 'Calculator', icon: 'calc' },
+  { id: 'calc', label: 'Calculator', icon: 'calculator' },
   { id: 'services', label: 'Services', icon: 'services' },
   { id: 'history', label: 'History', icon: 'history' },
-  { id: 'holiday', label: 'Holidays', icon: 'holiday' },
+  { id: 'holiday', label: 'Holidays', icon: 'holidays' },
   { id: 'about', label: 'About', icon: 'about' },
 ];
 
@@ -103,7 +103,7 @@ function Main() {
           const on = t.id === tab;
           return (
             <Pressable key={t.id} onPress={() => setTab(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }} style={st.tab}>
-              <TabIcon name={t.icon} color={on ? c.accent : c.muted} />
+              <Icon name={t.icon} color={on ? c.accent : c.muted} />
               <Text style={{ color: on ? c.accent : c.muted, fontSize: 11, fontWeight: '600' }}>{t.label}</Text>
             </Pressable>
           );

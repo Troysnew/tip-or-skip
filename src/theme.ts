@@ -11,6 +11,7 @@ const light = {
   yes: '#1F6B4A', yesBg: '#DCEFE4', maybe: '#8A5A00', maybeBg: '#F6EBCF',
   no: '#4F5963', noBg: '#E6EAEE', info: '#2F5574', infoBg: '#DFE9F2', scrim: 'rgba(5,15,10,0.45)',
   warn: '#8A3A2E',
+  border: '#708477', // interactive control outlines, 3:1 against surfaces
 };
 
 const dark: typeof light = {
@@ -20,6 +21,7 @@ const dark: typeof light = {
   yes: '#7AD4A6', yesBg: '#173B2A', maybe: '#E8C26E', maybeBg: '#3A2F14',
   no: '#BBC5CE', noBg: '#253039', info: '#9CC3E6', infoBg: '#1B2E40', scrim: 'rgba(0,0,0,0.6)',
   warn: '#F0A898',
+  border: '#668272',
 };
 
 export type Colors = typeof light;

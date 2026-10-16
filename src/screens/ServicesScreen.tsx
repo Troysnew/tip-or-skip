@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { font } from '../fonts';
 import { Text } from '../components/Text';
-import { Body, Btn, Card, H2, ServiceRow } from '../components/ui';
+import { CATEGORY_ICON } from '../components/icons';
+import { Body, Btn, Card, Chip, H2, ServiceRow } from '../components/ui';
 import { CATEGORIES, SERVICES } from '../data/services';
 import { closest, search } from '../lib/search';
 import { useColors } from '../theme';
@@ -36,14 +37,9 @@ export function ServicesScreen({ onOpenService, onRequest }: Props) {
         accessibilityLabel="Search services"
       />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-        {CATEGORIES.map((k) => {
-          const on = k === cat;
-          return (
-            <Pressable key={k} onPress={() => setCat(k)} accessibilityState={{ selected: on }} style={[st.chip, { borderColor: on ? c.ink : c.line, backgroundColor: on ? c.ink : 'transparent' }]}>
-              <Text style={{ color: on ? c.bg : c.muted, fontWeight: '600', fontSize: 13 }}>{k}</Text>
-            </Pressable>
-          );
-        })}
+        {CATEGORIES.map((k) => (
+          <Chip key={k} label={k} active={k === cat} icon={k === 'All' ? undefined : CATEGORY_ICON[k]} onPress={() => setCat(k)} />
+        ))}
       </ScrollView>
 
       {items.length ? (
@@ -72,6 +68,5 @@ export function ServicesScreen({ onOpenService, onRequest }: Props) {
 
 const st = StyleSheet.create({
   search: { borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 13, fontSize: 16, fontFamily: font('body') },
-  chip: { borderWidth: 1.5, borderRadius: 99, paddingHorizontal: 12, paddingVertical: 6 },
   count: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.7 },
 });

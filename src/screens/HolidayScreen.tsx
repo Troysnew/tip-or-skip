@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Linking, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { font } from '../fonts';
 import { Text } from '../components/Text';
-import { Body, Btn, Card, Checkbox, Chip, H2, H3, ProTag } from '../components/ui';
+import { Body, Btn, Card, Checkbox, Chip, EmptyState, H2, H3, ProTag } from '../components/ui';
 import { HOLIDAY_SOURCE_URL, HOLIDAY_TEMPLATES } from '../data/holiday';
 import { money, parseAmount } from '../lib/tip';
 import { newId, type HolidayItem } from '../state';
@@ -60,6 +60,11 @@ export function HolidayScreen() {
         </Card>
       </View>
 
+      {items.length === 0 && (
+        <Card>
+          <EmptyState icon="holidays" title="Add someone to start your holiday plan." detail="Pick from the suggestions below or type a name." />
+        </Card>
+      )}
       {items.length > 0 && (
         <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
           {items.map((it, i) => {

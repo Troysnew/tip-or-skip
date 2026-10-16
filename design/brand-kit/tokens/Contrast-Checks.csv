@@ -1,0 +1,35 @@
+Theme,Pair,Foreground,Background,Ratio,Threshold
+light,text on background,#10291F,#EEF2EE,13.67,4.5
+light,text on surface,#10291F,#FFFFFF,15.45,4.5
+light,textSecondary on background,#50645A,#EEF2EE,5.61,4.5
+light,textSecondary on surface,#50645A,#FFFFFF,6.34,4.5
+light,brand on background,#1F6B4A,#EEF2EE,5.7,4.5
+light,brand on surface,#1F6B4A,#FFFFFF,6.44,4.5
+light,brassText on background,#855C0C,#EEF2EE,5.26,4.5
+light,brassText on surface,#855C0C,#FFFFFF,5.94,4.5
+light,border on background,#708477,#EEF2EE,3.53,3
+light,border on surface,#708477,#FFFFFF,4.0,3
+light,focus on background,#1F6B4A,#EEF2EE,5.7,3
+light,focus on surface,#1F6B4A,#FFFFFF,6.44,3
+light,onBrand on brand,#FFFFFF,#1F6B4A,6.44,4.5
+light,"Yes, tip",#1F6B4A,#DCEFE4,5.37,4.5
+light,Your call,#8A5A00,#F6EBCF,5.0,4.5
+light,Skip it,#4F5963,#E6EAEE,5.9,4.5
+light,Included,#2F5574,#DFE9F2,6.39,4.5
+dark,text on background,#E4EEE7,#0D1712,15.4,4.5
+dark,text on surface,#E4EEE7,#15251C,13.46,4.5
+dark,textSecondary on background,#ADBFB3,#0D1712,9.47,4.5
+dark,textSecondary on surface,#ADBFB3,#15251C,8.28,4.5
+dark,brand on background,#5FC495,#0D1712,8.55,4.5
+dark,brand on surface,#5FC495,#15251C,7.47,4.5
+dark,brassText on background,#E0AE4A,#0D1712,8.99,4.5
+dark,brassText on surface,#E0AE4A,#15251C,7.86,4.5
+dark,border on background,#668272,#0D1712,4.35,3
+dark,border on surface,#668272,#15251C,3.81,3
+dark,focus on background,#5FC495,#0D1712,8.55,3
+dark,focus on surface,#5FC495,#15251C,7.47,3
+dark,onBrand on brand,#0D1712,#5FC495,8.55,4.5
+dark,"Yes, tip",#7AD4A6,#173B2A,6.96,4.5
+dark,Your call,#E8C26E,#3A2F14,7.75,4.5
+dark,Skip it,#BBC5CE,#253039,7.68,4.5
+dark,Included,#9CC3E6,#1B2E40,7.52,4.5

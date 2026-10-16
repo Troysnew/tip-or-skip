@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, Pressable, Share, StyleSheet, View } from 'react-native';
 import { Text } from '../components/Text';
-import { Body, Btn, Card, H2, H3, ProTag } from '../components/ui';
+import { Body, Btn, Card, EmptyState, H2, H3, ProTag } from '../components/ui';
 import { money } from '../lib/tip';
 import type { HistoryEntry } from '../state';
 import { useStore } from '../store';
@@ -82,8 +82,8 @@ export function HistoryScreen() {
       </View>
 
       {history.length === 0 ? (
-        <Card style={{ borderStyle: 'dashed' }}>
-          <Body muted>Nothing saved yet. On the calculator, tap Save to history after you work out a tip.</Body>
+        <Card>
+          <EmptyState icon="history" title="Your saved calculations will appear here." detail="On the calculator, tap Save to history after you work out a tip." />
         </Card>
       ) : (
         <>

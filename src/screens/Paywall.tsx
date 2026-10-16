@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
 import { Text } from '../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Body, Btn } from '../components/ui';
@@ -18,6 +18,7 @@ const FEATURES: { title: string; line: string; soon?: boolean }[] = [
 export function Paywall() {
   const c = useColors();
   const insets = useSafeAreaInsets();
+  const scheme = useColorScheme();
   const { paywall, closePaywall, setPro, flash } = useStore();
   const [busy, setBusy] = useState(false);
   if (paywall === null) return null;
@@ -41,9 +42,15 @@ export function Paywall() {
       <View style={st.wrap} pointerEvents="box-none">
         <View style={[st.sheet, { backgroundColor: c.bg, paddingBottom: insets.bottom + 16 }]}>
           <ScrollView contentContainerStyle={{ gap: 14, padding: 20 }}>
+            <Image
+              source={scheme === 'dark' ? require('../../assets/brand/paywall-header-dark.png') : require('../../assets/brand/paywall-header-light.png')}
+              style={st.header}
+              resizeMode="contain"
+              accessibilityLabel="Tip or Skip Pro"
+            />
             <View style={{ gap: 4 }}>
               <Text style={[st.eyebrow, { color: c.brassText }]}>{paywall ? `${paywall} is a Pro feature` : 'Upgrade'}</Text>
-              <Text style={[st.title, { color: c.ink }]}>Tip or Skip Pro</Text>
+              <Text style={[st.title, { color: c.ink }]}>Unlock Pro</Text>
               <Body muted>One payment of {PRO_PRICE}. No subscription.</Body>
             </View>
             <View style={{ gap: 12 }}>
@@ -81,6 +88,7 @@ const st = StyleSheet.create({
   wrap: { flex: 1, justifyContent: 'flex-end' },
   sheet: { maxHeight: '92%', borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   eyebrow: { fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.8 },
+  header: { width: '100%', aspectRatio: 1024 / 320, borderRadius: 16 },
   title: { fontFamily: 'display', fontSize: 28, fontWeight: '800', letterSpacing: -0.5 },
   feature: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   note: { borderRadius: 10, padding: 12 },
