@@ -1,4 +1,4 @@
-import { Platform, useColorScheme } from 'react-native';
+import { useColorScheme } from 'react-native';
 import type { Verdict } from './data/services';
 
 // Palette from the design team's brand review (Oct 16, 2026).
@@ -37,4 +37,6 @@ export function verdictColors(c: Colors, v: Verdict) {
   }
 }
 
-export const mono = Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' });
+/** fontFamily sentinels read by components/Text. TextInput needs a real file name: use font() from fonts.ts. */
+export const mono = 'mono';
+export const display = 'display';

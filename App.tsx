@@ -1,6 +1,11 @@
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FONT_FILES } from './src/fonts';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from './src/components/Text';
+import { TabIcon, type IconName } from './src/components/icons';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Service } from './src/data/services';
 import { CalculatorScreen } from './src/screens/CalculatorScreen';
@@ -15,15 +20,23 @@ import { StoreProvider, useStore } from './src/store';
 import { useColors } from './src/theme';
 
 type Tab = 'calc' | 'services' | 'history' | 'holiday' | 'about';
-const TABS: { id: Tab; label: string; glyph: string }[] = [
-  { id: 'calc', label: 'Calculator', glyph: '%' },
-  { id: 'services', label: 'Services', glyph: '?' },
-  { id: 'history', label: 'History', glyph: '≡' },
-  { id: 'holiday', label: 'Holidays', glyph: '★' },
-  { id: 'about', label: 'About', glyph: 'i' },
+const TABS: { id: Tab; label: string; icon: IconName }[] = [
+  { id: 'calc', label: 'Calculator', icon: 'calc' },
+  { id: 'services', label: 'Services', icon: 'services' },
+  { id: 'history', label: 'History', icon: 'history' },
+  { id: 'holiday', label: 'Holidays', icon: 'holiday' },
+  { id: 'about', label: 'About', icon: 'about' },
 ];
 
+// Keep the splash screen up until the brand fonts are ready, so nothing renders in a fallback font.
+SplashScreen.preventAutoHideAsync();
+
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts(FONT_FILES);
+  useEffect(() => {
+    if (fontsLoaded || fontError) SplashScreen.hide();
+  }, [fontsLoaded, fontError]);
+  if (!fontsLoaded && !fontError) return null;
   return (
     <SafeAreaProvider>
       <StoreProvider>
@@ -90,7 +103,7 @@ function Main() {
           const on = t.id === tab;
           return (
             <Pressable key={t.id} onPress={() => setTab(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }} style={st.tab}>
-              <Text style={{ color: on ? c.accent : c.muted, fontSize: 18, fontWeight: '800' }}>{t.glyph}</Text>
+              <TabIcon name={t.icon} color={on ? c.accent : c.muted} />
               <Text style={{ color: on ? c.accent : c.muted, fontSize: 11, fontWeight: '600' }}>{t.label}</Text>
             </Pressable>
           );
@@ -112,7 +125,7 @@ function Main() {
 const st = StyleSheet.create({
   root: { flex: 1 },
   tag: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
-  brand: { fontSize: 32, fontWeight: '800', letterSpacing: -0.6 },
+  brand: { fontFamily: 'display', fontSize: 33, fontWeight: '800', letterSpacing: -0.6 },
   tabs: { flexDirection: 'row', borderTopWidth: 1 },
   tab: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 10, gap: 2 },
   toast: { position: 'absolute', alignSelf: 'center', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 99 },

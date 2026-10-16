@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Body, Btn } from '../components/ui';
 import { buyPro, PRO_PRICE, restorePro, TEST_MODE } from '../pro/purchases';
@@ -80,7 +81,7 @@ const st = StyleSheet.create({
   wrap: { flex: 1, justifyContent: 'flex-end' },
   sheet: { maxHeight: '92%', borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   eyebrow: { fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.8 },
-  title: { fontSize: 28, fontWeight: '800', letterSpacing: -0.5 },
+  title: { fontFamily: 'display', fontSize: 28, fontWeight: '800', letterSpacing: -0.5 },
   feature: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   note: { borderRadius: 10, padding: 12 },
 });

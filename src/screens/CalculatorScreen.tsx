@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { font } from '../fonts';
+import { Text } from '../components/Text';
 import { Btn, Card, Chip, Label, MoneyField, Pill, ProTag, Segmented, ServiceRow, Stepper, TipButtons, type TipOption } from '../components/ui';
 import { byId, SERVICES } from '../data/services';
 import { search } from '../lib/search';
@@ -216,7 +218,7 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
                     keyboardType="decimal-pad"
                     placeholder="0.00"
                     placeholderTextColor={c.muted}
-                    style={{ flex: 1, color: c.ink, fontFamily: mono, fontWeight: '700', fontSize: 16, paddingVertical: 8, paddingHorizontal: 4 }}
+                    style={{ flex: 1, color: c.ink, fontFamily: font('mono', 700), fontSize: 16, paddingVertical: 8, paddingHorizontal: 4 }}
                     accessibilityLabel={`Amount for ${p.name || `person ${i + 1}`}`}
                   />
                 </View>
@@ -313,7 +315,7 @@ function Line({ k, v, big }: { k: string; v: string; big?: boolean }) {
 }
 
 const st = StyleSheet.create({
-  input: { borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 13, fontSize: 16 },
+  input: { borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 13, fontSize: 16, fontFamily: font('body') },
   ctx: { borderRadius: 10, padding: 12, gap: 10 },
   two: { flexDirection: 'row', gap: 12 },
   totals: { borderTopWidth: 2, borderStyle: 'dashed', paddingTop: 14, gap: 6 },

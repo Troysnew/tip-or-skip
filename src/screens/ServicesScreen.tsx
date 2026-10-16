@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { font } from '../fonts';
+import { Text } from '../components/Text';
 import { Body, Btn, Card, H2, ServiceRow } from '../components/ui';
 import { CATEGORIES, SERVICES } from '../data/services';
 import { closest, search } from '../lib/search';
@@ -69,7 +71,7 @@ export function ServicesScreen({ onOpenService, onRequest }: Props) {
 }
 
 const st = StyleSheet.create({
-  search: { borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 13, fontSize: 16 },
+  search: { borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 13, fontSize: 16, fontFamily: font('body') },
   chip: { borderWidth: 1.5, borderRadius: 99, paddingHorizontal: 12, paddingVertical: 6 },
   count: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.7 },
 });

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Alert, Pressable, Share, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, Share, StyleSheet, View } from 'react-native';
+import { Text } from '../components/Text';
 import { Body, Btn, Card, H2, H3, ProTag } from '../components/ui';
 import { money } from '../lib/tip';
 import type { HistoryEntry } from '../state';

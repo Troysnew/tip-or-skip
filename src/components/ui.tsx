@@ -1,5 +1,7 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
+import { font } from '../fonts';
+import { Text } from './Text';
 import { VERDICT_TEXT, type Service, type Verdict } from '../data/services';
 import { normLabel } from '../lib/tip';
 import { mono, useColors, verdictColors } from '../theme';
@@ -211,15 +213,15 @@ export function Bars({ rows, max }: { rows: [string, number][]; max: number }) {
 
 const s = StyleSheet.create({
   card: { borderWidth: 1, borderRadius: 14, padding: 16, gap: 10 },
-  h2: { fontSize: 22, fontWeight: '800', letterSpacing: -0.3 },
-  h3: { fontSize: 16, fontWeight: '700' },
+  h2: { fontFamily: 'display', fontSize: 23, fontWeight: '800', letterSpacing: -0.3 },
+  h3: { fontFamily: 'display', fontSize: 17, fontWeight: '700' },
   label: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
   pill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99, alignSelf: 'center' },
   dot: { width: 7, height: 7, borderRadius: 4 },
   pillText: { fontSize: 12, fontWeight: '700' },
   btn: { borderRadius: 12, paddingVertical: 13, paddingHorizontal: 16, alignItems: 'center', justifyContent: 'center' },
   money: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: 12, paddingHorizontal: 12 },
-  moneyInput: { flex: 1, paddingVertical: 10, paddingHorizontal: 6, fontFamily: mono, fontSize: 19, fontWeight: '700' },
+  moneyInput: { flex: 1, paddingVertical: 10, paddingHorizontal: 6, fontFamily: font('mono', 700), fontSize: 19 },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   stepBtn: { width: 40, height: 40, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   stepVal: { fontFamily: mono, fontWeight: '700', fontSize: 18, minWidth: 34, textAlign: 'center' },

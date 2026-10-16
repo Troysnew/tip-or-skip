@@ -2,7 +2,7 @@
   "expo": {
     "name": "Tip or Skip",
     "slug": "tip-or-skip",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -23,6 +23,21 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "backgroundColor": "#1F6B4A",
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#0D1712"
+          }
+        }
+      ]
+    ]
   }
 }

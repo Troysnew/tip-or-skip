@@ -1,5 +1,6 @@
 import React from 'react';
-import { Linking, Text, View } from 'react-native';
+import { Linking, View } from 'react-native';
+import { Text } from '../components/Text';
 import { Body, Btn, Card, H2, H3, ProTag } from '../components/ui';
 import { PRO_PRICE, TEST_MODE } from '../pro/purchases';
 import { useStore } from '../store';
@@ -41,7 +42,7 @@ export function DataScreen() {
           </>
         )}
       </Card>
-      <Text style={{ color: c.muted, fontSize: 12 }}>Version 0.2.0</Text>
+      <Text style={{ color: c.muted, fontSize: 12 }}>Version 0.3.0</Text>
       <View style={{ gap: 4 }}>
         <H2>Where the numbers come from</H2>
         <Body muted>Stats appear only where a published survey measured that service. Everything else waits for in-app responses.</Body>

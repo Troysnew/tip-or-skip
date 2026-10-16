@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bars, Body, Btn, Card, H3, MoneyField, Stepper, TipButtons, type TipOption } from '../components/ui';
 import { VERDICT_TEXT, byId, type Service } from '../data/services';
@@ -180,10 +181,10 @@ const st = StyleSheet.create({
   grab: { width: 40, height: 5, borderRadius: 3, alignSelf: 'center', marginBottom: 10 },
   head: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   eyebrow: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8 },
-  title: { fontSize: 22, fontWeight: '800', letterSpacing: -0.3 },
+  title: { fontFamily: 'display', fontSize: 23, fontWeight: '800', letterSpacing: -0.3 },
   x: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   verdict: { borderRadius: 14, padding: 16, gap: 6 },
-  answer: { fontSize: 26, fontWeight: '800' },
+  answer: { fontFamily: 'display', fontSize: 27, fontWeight: '800' },
   result: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', borderTopWidth: 2, borderStyle: 'dashed', paddingTop: 10 },
   resultNum: { fontFamily: mono, fontWeight: '700', fontSize: 24 },
   nodata: { borderRadius: 10, padding: 12 },

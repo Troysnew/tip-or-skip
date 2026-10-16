@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { font } from '../fonts';
+import { Text } from '../components/Text';
 import { Body, Btn, Card, Checkbox, Chip, H2, H3, ProTag } from '../components/ui';
 import { HOLIDAY_TEMPLATES } from '../data/holiday';
 import { money, parseAmount } from '../lib/tip';
@@ -77,7 +79,7 @@ export function HolidayScreen() {
                     keyboardType="decimal-pad"
                     placeholder="0"
                     placeholderTextColor={c.muted}
-                    style={{ flex: 1, color: c.ink, fontFamily: mono, fontWeight: '700', fontSize: 15, paddingVertical: 6, paddingHorizontal: 4 }}
+                    style={{ flex: 1, color: c.ink, fontFamily: font('mono', 700), fontSize: 15, paddingVertical: 6, paddingHorizontal: 4 }}
                     accessibilityLabel={`Amount for ${it.who}`}
                   />
                 </View>
@@ -123,5 +125,5 @@ const st = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14 },
   amount: { width: 84, flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 8 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  input: { flex: 1, borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9, fontSize: 15 },
+  input: { flex: 1, borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9, fontSize: 15, fontFamily: font('body') },
 });
