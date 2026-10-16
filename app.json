@@ -8,7 +8,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.tiporskip.app",
+      "bundleIdentifier": "com.troyharris.tiporskip",
       "config": {
         "usesNonExemptEncryption": false
       }
@@ -37,6 +37,12 @@
         }
       ]
     ],
-    "primaryColor": "#1F6B4A"
+    "primaryColor": "#1F6B4A",
+    "owner": "troysnew",
+    "extra": {
+      "eas": {
+        "projectId": "fbb172ff-3888-4236-8f45-9e89cdc265e9"
+      }
+    }
   }
 }

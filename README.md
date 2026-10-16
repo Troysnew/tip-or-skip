@@ -107,7 +107,7 @@ Apple requires one interactive sign-in so Expo can create the app's signing cert
    ```
 3. Follow the prompts:
    - Sign in to your Expo account.
-   - Confirm the bundle identifier `com.tiporskip.app`.
+   - Confirm the bundle identifier `com.troyharris.tiporskip`. (`com.tiporskip.app` is registered to another Apple developer.)
    - Sign in with the Apple ID on your developer account, including the two-factor code.
    - Let it create the distribution certificate, provisioning profile, and App Store Connect API key.
 4. It creates the app in App Store Connect, builds in Expo's cloud, and uploads to TestFlight. When processing finishes, install it on your iPhone with the TestFlight app.
