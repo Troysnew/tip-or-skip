@@ -19,6 +19,8 @@ export interface Service {
   unit?: string;
   qtyLabel?: string;
   source: string;
+  /** Page the guidance comes from. Services without one still need an editorial source check. */
+  sourceUrl?: string;
   pew?: PewKey;
   bankrate?: BankrateKey;
   /** Show the Pew restaurant tip-amount distribution. */
@@ -36,6 +38,9 @@ export const VERDICT_TEXT: Record<Verdict, { answer: string; short: string }> = 
 };
 
 const EPI = 'Emily Post Institute';
+const EPI_URL = 'https://emilypost.com/advice/general-tipping-guide';
+const EPI_HOLIDAY_URL = 'https://emilypost.com/advice/holiday-tipping-guide';
+const EPI_FINER_URL = 'https://emilypost.com/advice/finer-points-of-tipping';
 const COMMON = 'Common US guidance';
 const AHLA = 'AHLA';
 
@@ -44,37 +49,37 @@ const cat = (category: Category, rows: Row[]): Service[] => rows.map((r) => ({ .
 
 export const SERVICES: Service[] = [
   ...cat('Food & drink', [
-    { id: 'restaurant', name: 'Sit-down restaurant', aliases: ['waiter', 'waitress', 'server', 'dinner', 'restaurant', 'diner'], verdict: 'expected', pct: [15, 20, 18], source: EPI, pew: 'restaurant', bankrate: 'restaurant', amountStats: true, note: 'Tip on the pre-tax amount. Check the bill for an automatic gratuity or service charge first, especially with large parties.' },
-    { id: 'bar', name: 'Bartender', aliases: ['bar', 'drinks', 'beer', 'cocktail', 'pub'], verdict: 'expected', flat: [1, 2, 1], unit: 'per drink', qtyLabel: 'Drinks', source: EPI, pew: 'bar', note: '$1 to $2 per drink, or 15% to 20% if you run a tab.' },
-    { id: 'coffee', name: 'Coffee shop / barista', aliases: ['barista', 'starbucks', 'latte', 'cafe', 'coffee'], verdict: 'optional', flat: [0, 1, 1], unit: 'per drink', qtyLabel: 'Drinks', source: EPI, pew: 'coffee', bankrate: 'coffee', note: 'A tip screen does not make it required. Drop change or $1 if they made something complicated.' },
-    { id: 'fastcasual', name: 'Fast casual / order at counter', aliases: ['chipotle', 'counter', 'fast casual', 'panera', 'sandwich shop'], verdict: 'optional', pct: [0, 10, 0], source: COMMON, pew: 'fastcasual', note: 'No server, so no tip is expected. Some people tip 10% when staff bring food to the table or handle a big order.' },
+    { id: 'restaurant', name: 'Sit-down restaurant', aliases: ['waiter', 'waitress', 'server', 'dinner', 'restaurant', 'diner'], verdict: 'expected', pct: [15, 20, 18], source: EPI, pew: 'restaurant', bankrate: 'restaurant', amountStats: true, sourceUrl: EPI_URL, note: 'Tip on the pre-tax amount. Check the bill for an automatic gratuity or service charge first, especially with large parties.' },
+    { id: 'bar', name: 'Bartender', aliases: ['bar', 'drinks', 'beer', 'cocktail', 'pub'], verdict: 'expected', flat: [1, 2, 1], unit: 'per drink', qtyLabel: 'Drinks', source: EPI, pew: 'bar', sourceUrl: EPI_URL, note: '$1 to $2 per drink, or 15% to 20% if you run a tab.' },
+    { id: 'coffee', name: 'Coffee shop / barista', aliases: ['barista', 'starbucks', 'latte', 'cafe', 'coffee'], verdict: 'optional', flat: [0, 1, 0], unit: 'per drink', qtyLabel: 'Drinks', source: EPI, pew: 'coffee', bankrate: 'coffee', sourceUrl: EPI_URL, note: 'No obligation, and a tip screen does not make it required. Emily Post suggests tipping now and then if they go the extra mile or you are a regular.' },
+    { id: 'fastcasual', name: 'Fast casual / order at counter', aliases: ['chipotle', 'counter', 'fast casual', 'panera', 'sandwich shop'], verdict: 'optional', pct: [0, 10, 0], source: EPI, pew: 'fastcasual', sourceUrl: EPI_URL, note: 'No server, so no tip is expected. Some people tip 10% when staff bring food to the table or handle a big order.' },
     { id: 'fastfood', name: 'Fast food drive-thru', aliases: ['mcdonalds', 'drive thru', 'drive-thru', 'burger'], verdict: 'not', pct: [0, 0, 0], source: COMMON, note: 'Not expected.' },
-    { id: 'takeout', name: 'Takeout pickup', aliases: ['to go', 'to-go', 'carryout', 'pickup', 'take out'], verdict: 'optional', pct: [0, 10, 0], source: COMMON, bankrate: 'takeout', note: 'Optional. 10% is generous for large or complicated orders.' },
-    { id: 'buffet', name: 'Buffet', aliases: ['all you can eat'], verdict: 'expected', pct: [10, 10, 10], source: COMMON, note: 'Someone still clears plates and refills drinks. 10% is the usual figure.' },
-    { id: 'foodtruck', name: 'Food truck', aliases: ['truck', 'street food'], verdict: 'optional', pct: [0, 10, 0], source: COMMON, note: 'Optional, like other counter service.' },
-    { id: 'icecream', name: 'Ice cream shop', aliases: ['frozen yogurt', 'gelato', 'froyo'], verdict: 'optional', flat: [0, 1, 1], unit: 'per order', qtyLabel: 'Orders', source: COMMON, note: 'Tip jar change is fine. Not expected.' },
+    { id: 'takeout', name: 'Takeout pickup', aliases: ['to go', 'to-go', 'carryout', 'pickup', 'take out'], verdict: 'optional', pct: [0, 10, 0], source: EPI, bankrate: 'takeout', sourceUrl: EPI_URL, note: 'No obligation. Emily Post suggests 10% for curbside service or a large, complicated order.' },
+    { id: 'buffet', name: 'Buffet', aliases: ['all you can eat'], verdict: 'expected', pct: [10, 10, 10], source: EPI, sourceUrl: EPI_URL, note: 'Someone still clears plates and refills drinks. Emily Post says 10%, figured before tax.' },
+    { id: 'foodtruck', name: 'Food truck', aliases: ['truck', 'street food'], verdict: 'optional', pct: [0, 10, 0], source: EPI, sourceUrl: EPI_URL, note: 'No obligation, like other tip-jar counter service. Tip now and then if they go the extra mile.' },
+    { id: 'icecream', name: 'Ice cream shop', aliases: ['frozen yogurt', 'gelato', 'froyo'], verdict: 'optional', flat: [0, 1, 1], unit: 'per order', qtyLabel: 'Orders', source: EPI, sourceUrl: EPI_URL, note: 'No obligation. Tip-jar change now and then is a nice gesture.' },
     { id: 'catering', name: 'Catering staff', aliases: ['caterer', 'event staff', 'banquet'], verdict: 'expected', pct: [15, 20, 18], source: COMMON, note: 'Read the contract first. Many caterers already add a service charge, which is not always passed to staff.' },
     { id: 'autograt', name: 'Large party with auto-gratuity', aliases: ['auto gratuity', 'service charge', 'gratuity included', 'party of 6'], verdict: 'included', pct: [0, 0, 0], source: COMMON, note: 'The tip is already on the bill. Add more only if service stood out.' },
     { id: 'sommelier', name: 'Sommelier', aliases: ['wine', 'wine steward'], verdict: 'optional', pct: [10, 15, 10], source: COMMON, note: 'Applies to the wine portion. Only when a sommelier actively helped choose.' },
   ]),
   ...cat('Delivery', [
-    { id: 'delivery', name: 'Food delivery app', aliases: ['doordash', 'uber eats', 'grubhub', 'delivery driver', 'delivery'], verdict: 'expected', pct: [10, 20, 15], source: EPI, pew: 'delivery', bankrate: 'delivery', note: 'Emily Post lists 10% to 15%. Add more for bad weather, long distances, or big orders. Many people use $3 to $5 as a floor on small orders.' },
-    { id: 'pizza', name: 'Pizza delivery', aliases: ['dominos', 'papa johns', 'pizza'], verdict: 'expected', pct: [10, 20, 15], source: COMMON, note: 'A "delivery fee" usually goes to the store, not the driver.' },
+    { id: 'delivery', name: 'Food delivery app', aliases: ['doordash', 'uber eats', 'grubhub', 'delivery driver', 'delivery'], verdict: 'expected', pct: [10, 15, 15], source: EPI, pew: 'delivery', bankrate: 'delivery', sourceUrl: EPI_URL, note: 'Emily Post says 10% to 15% of the bill. Add more for bad weather, long distances, or big orders.' },
+    { id: 'pizza', name: 'Pizza delivery', aliases: ['dominos', 'papa johns', 'pizza'], verdict: 'expected', flat: [2, 5, 3], unit: 'per delivery', qtyLabel: 'Deliveries', source: EPI, sourceUrl: EPI_URL, note: 'Emily Post says $2 to $5, depending on the size of the order and how hard the delivery is. A "delivery fee" usually goes to the store, not the driver.' },
     { id: 'grocery', name: 'Grocery delivery', aliases: ['instacart', 'shipt', 'walmart delivery', 'groceries'], verdict: 'expected', pct: [10, 15, 10], source: COMMON, note: 'Shoppers pick and carry everything, so tip like food delivery.' },
-    { id: 'mail', name: 'Mail carrier (USPS)', aliases: ['mailman', 'postal', 'usps', 'postman'], verdict: 'not', pct: [0, 0, 0], source: 'USPS rule', note: 'Carriers cannot accept cash. A holiday gift worth $20 or less is allowed.' },
-    { id: 'package', name: 'UPS / FedEx / Amazon driver', aliases: ['ups', 'fedex', 'amazon', 'package', 'parcel'], verdict: 'not', pct: [0, 0, 0], source: COMMON, note: 'Not expected. Some companies limit what drivers can accept. A cold drink or small holiday gift is a common thank you.' },
-    { id: 'furniture', name: 'Furniture / appliance delivery', aliases: ['appliance', 'couch delivery', 'mattress'], verdict: 'optional', flat: [10, 20, 10], unit: 'per person', qtyLabel: 'Crew members', source: COMMON, note: 'Customary when they carry heavy items up stairs or install something.' },
+    { id: 'mail', name: 'Mail carrier (USPS)', aliases: ['mailman', 'postal', 'usps', 'postman'], verdict: 'not', pct: [0, 0, 0], source: 'Emily Post Institute (USPS rules)', sourceUrl: EPI_HOLIDAY_URL, note: 'Carriers cannot accept cash, checks, or gift cards. A small holiday gift worth $20 or less, or snacks and drinks, is allowed.' },
+    { id: 'package', name: 'UPS / FedEx / Amazon driver', aliases: ['ups', 'fedex', 'amazon', 'package', 'parcel'], verdict: 'not', pct: [0, 0, 0], source: EPI, sourceUrl: EPI_HOLIDAY_URL, note: 'Not expected per delivery. Emily Post suggests a holiday gift around $20, only if you get regular deliveries, and no cash.' },
+    { id: 'furniture', name: 'Furniture / appliance delivery', aliases: ['appliance', 'couch delivery', 'mattress'], verdict: 'optional', flat: [10, 20, 10], unit: 'per person', qtyLabel: 'Crew members', source: EPI, sourceUrl: EPI_FINER_URL, note: 'Customs vary by store. Emily Post suggests calling the store to ask whether tipping is customary. A tip is most common when they carry heavy items up stairs or install something.' },
     { id: 'movers', name: 'Movers', aliases: ['moving company', 'moving crew', 'two men and a truck'], verdict: 'expected', flat: [4, 8, 5], unit: 'per mover, per hour', qtyLabel: 'Mover-hours', source: COMMON, note: 'Hand it to each mover directly, or to the crew lead if they will split it. Cold water and snacks are appreciated too.' },
   ]),
   ...cat('Travel', [
-    { id: 'housekeeping', name: 'Hotel housekeeping', aliases: ['maid', 'hotel maid', 'room cleaning', 'hotel'], verdict: 'expected', flat: [2, 5, 5], unit: 'per night', qtyLabel: 'Nights', source: EPI, bankrate: 'housekeeping', note: 'Leave it daily with a note marked for housekeeping, since staff can change during your stay. No tip for days you skip service.' },
-    { id: 'bellhop', name: 'Bellhop / doorman', aliases: ['bellman', 'porter', 'luggage', 'bags', 'doorman'], verdict: 'expected', flat: [1, 4, 2], unit: 'per bag', qtyLabel: 'Bags', source: EPI, note: 'Emily Post lists $1 to $4. AHLA has suggested up to $5 per bag for heavy luggage.' },
-    { id: 'valet', name: 'Valet parking', aliases: ['valet', 'parking attendant'], verdict: 'expected', flat: [2, 5, 3], unit: 'per retrieval', qtyLabel: 'Retrievals', source: EPI, note: 'Tip when the car comes back to you.' },
-    { id: 'concierge', name: 'Hotel concierge', aliases: ['concierge', 'reservations'], verdict: 'optional', flat: [5, 10, 5], unit: 'per request', qtyLabel: 'Requests', source: EPI, note: 'No tip for directions or questions. Tip when they book a table or land tickets.' },
+    { id: 'housekeeping', name: 'Hotel housekeeping', aliases: ['maid', 'hotel maid', 'room cleaning', 'hotel'], verdict: 'expected', flat: [2, 5, 5], unit: 'per night', qtyLabel: 'Nights', source: EPI, bankrate: 'housekeeping', sourceUrl: EPI_URL, note: 'Leave it daily with a note marked for housekeeping, since staff can change during your stay. No tip for days you skip service.' },
+    { id: 'bellhop', name: 'Bellhop / doorman', aliases: ['bellman', 'porter', 'luggage', 'bags', 'doorman'], verdict: 'expected', flat: [1, 4, 2], unit: 'per bag', qtyLabel: 'Bags', source: EPI, sourceUrl: EPI_URL, note: 'Bellhop: $2 for the first bag and $1 for each one after. Doorman: $1 to $4 for carrying luggage.' },
+    { id: 'valet', name: 'Valet parking', aliases: ['valet', 'parking attendant'], verdict: 'expected', flat: [2, 5, 3], unit: 'per retrieval', qtyLabel: 'Retrievals', source: EPI, sourceUrl: EPI_URL, note: 'Tip when the car comes back to you.' },
+    { id: 'concierge', name: 'Hotel concierge', aliases: ['concierge', 'reservations'], verdict: 'optional', flat: [5, 10, 5], unit: 'per request', qtyLabel: 'Requests', source: EPI, sourceUrl: EPI_URL, note: 'No tip for directions or questions. Tip when they book a table or land tickets.' },
     { id: 'roomservice', name: 'Room service', aliases: ['in room dining'], verdict: 'expected', pct: [15, 20, 15], source: AHLA, note: 'Check the slip first. Many hotels already add a gratuity.' },
-    { id: 'taxi', name: 'Taxi', aliases: ['cab', 'cabbie', 'taxi driver'], verdict: 'expected', pct: [15, 20, 15], source: EPI, pew: 'rideshare', note: 'Emily Post adds $2 for the first bag and $1 for each additional bag the driver handles.' },
-    { id: 'rideshare', name: 'Uber / Lyft driver', aliases: ['uber', 'lyft', 'rideshare', 'ride share'], verdict: 'expected', pct: [15, 20, 15], source: EPI, pew: 'rideshare', note: 'You can tip in the app after the ride.' },
-    { id: 'skycap', name: 'Airport skycap', aliases: ['curbside check in', 'airport porter'], verdict: 'expected', flat: [1, 2, 2], unit: 'per bag', qtyLabel: 'Bags', source: COMMON, note: 'Separate from any bag fee the airline charges.' },
+    { id: 'taxi', name: 'Taxi', aliases: ['cab', 'cabbie', 'taxi driver'], verdict: 'expected', pct: [15, 20, 15], source: EPI, pew: 'rideshare', sourceUrl: EPI_URL, note: 'Emily Post sets a $1 minimum, plus $2 for the first bag and $1 for each additional bag the driver handles.' },
+    { id: 'rideshare', name: 'Uber / Lyft driver', aliases: ['uber', 'lyft', 'rideshare', 'ride share'], verdict: 'expected', pct: [15, 20, 15], source: 'Emily Post Institute (taxi guidance)', pew: 'rideshare', sourceUrl: EPI_URL, note: 'Emily Post gives this range for taxis, and rideshare is usually tipped the same way. You can tip in the app after the ride.' },
+    { id: 'skycap', name: 'Airport skycap', aliases: ['curbside check in', 'airport porter'], verdict: 'expected', flat: [1, 2, 2], unit: 'per bag', qtyLabel: 'Bags', source: EPI, sourceUrl: EPI_URL, note: 'Emily Post says $2 for the first bag and $1 for each one after. Separate from any bag fee the airline charges.' },
     { id: 'shuttle', name: 'Hotel / airport shuttle driver', aliases: ['shuttle'], verdict: 'optional', flat: [1, 2, 2], unit: 'per bag', qtyLabel: 'Bags', source: COMMON, note: 'When they load and unload your luggage.' },
     { id: 'tourguide', name: 'Tour guide', aliases: ['walking tour', 'guide', 'excursion'], verdict: 'expected', pct: [10, 20, 15], source: COMMON, note: 'For free walking tours the tip is the price. $10 to $20 per person is common.' },
     { id: 'cruise', name: 'Cruise staff', aliases: ['cruise', 'cruise ship'], verdict: 'included', pct: [0, 0, 0], source: COMMON, note: 'Most lines add a daily gratuity to your account. Extra cash for standout service is optional.' },
@@ -86,12 +91,12 @@ export const SERVICES: Service[] = [
     { id: 'tow', name: 'Tow truck driver', aliases: ['roadside assistance', 'towing'], verdict: 'optional', flat: [5, 20, 10], unit: 'per tow', qtyLabel: 'Tows', source: COMMON, note: 'Optional. More in bad weather or a tricky recovery.' },
   ]),
   ...cat('Personal care', [
-    { id: 'haircut', name: 'Barber / haircut', aliases: ['barber', 'haircut', 'fade', 'trim'], verdict: 'expected', pct: [15, 20, 20], source: COMMON, pew: 'haircut', bankrate: 'haircut', note: 'Tip even if the barber owns the shop. That old rule has mostly faded.' },
-    { id: 'stylist', name: 'Hair stylist / color', aliases: ['salon', 'hairdresser', 'highlights', 'blowout', 'color'], verdict: 'expected', pct: [15, 20, 20], source: COMMON, bankrate: 'haircut', note: 'Tip the assistant who shampoos you $3 to $5 separately.' },
-    { id: 'nails', name: 'Nail salon', aliases: ['manicure', 'pedicure', 'nails', 'gel'], verdict: 'expected', pct: [15, 20, 20], source: COMMON, note: 'Leave cash if you can, so it goes straight to your tech.' },
-    { id: 'massage', name: 'Massage therapist', aliases: ['massage', 'spa massage'], verdict: 'expected', pct: [15, 20, 20], source: EPI, note: 'Check whether the spa added a service charge. Medical or physical therapy massage is not tipped.' },
-    { id: 'spa', name: 'Spa treatment', aliases: ['facial', 'spa', 'body wrap'], verdict: 'expected', pct: [15, 20, 18], source: COMMON, note: 'Resorts often add 18% to 20% automatically. Read the bill.' },
-    { id: 'wax', name: 'Waxing / brows', aliases: ['eyebrow', 'threading', 'brow', 'lash'], verdict: 'expected', pct: [15, 20, 20], source: COMMON, note: 'Same as other salon services.' },
+    { id: 'haircut', name: 'Barber / haircut', aliases: ['barber', 'haircut', 'fade', 'trim'], verdict: 'expected', pct: [15, 20, 20], source: EPI, pew: 'haircut', bankrate: 'haircut', sourceUrl: EPI_URL, note: 'Tip even if the barber owns the shop. That old rule has mostly faded.' },
+    { id: 'stylist', name: 'Hair stylist / color', aliases: ['salon', 'hairdresser', 'highlights', 'blowout', 'color'], verdict: 'expected', pct: [15, 20, 20], source: EPI, bankrate: 'haircut', sourceUrl: EPI_URL, note: 'Tip the assistant who shampoos you $3 to $5 separately.' },
+    { id: 'nails', name: 'Nail salon', aliases: ['manicure', 'pedicure', 'nails', 'gel'], verdict: 'expected', pct: [15, 20, 20], source: EPI, sourceUrl: EPI_URL, note: 'Leave cash if you can, so it goes straight to your tech.' },
+    { id: 'massage', name: 'Massage therapist', aliases: ['massage', 'spa massage'], verdict: 'expected', pct: [15, 20, 20], source: EPI, sourceUrl: EPI_URL, note: 'Check whether the spa added a service charge. Medical or physical therapy massage is not tipped.' },
+    { id: 'spa', name: 'Spa treatment', aliases: ['facial', 'spa', 'body wrap'], verdict: 'expected', pct: [15, 20, 18], source: EPI, sourceUrl: EPI_URL, note: 'Resorts often add 18% to 20% automatically. Read the bill.' },
+    { id: 'wax', name: 'Waxing / brows', aliases: ['eyebrow', 'threading', 'brow', 'lash'], verdict: 'expected', pct: [15, 20, 20], source: EPI, sourceUrl: EPI_URL, note: 'Same as other salon services.' },
     { id: 'tattoo', name: 'Tattoo artist', aliases: ['tattoo', 'piercing'], verdict: 'expected', pct: [15, 25, 20], source: COMMON, note: 'Common for custom work. Piercers usually get $5 to $10 or 20%.' },
     { id: 'makeup', name: 'Makeup artist', aliases: ['mua', 'bridal makeup'], verdict: 'expected', pct: [15, 20, 20], source: COMMON, note: 'Check event contracts for an included gratuity.' },
     { id: 'groomer', name: 'Dog groomer', aliases: ['pet grooming', 'dog wash'], verdict: 'expected', pct: [15, 20, 15], source: COMMON, note: 'More for a difficult or matted pet.' },
@@ -108,7 +113,7 @@ export const SERVICES: Service[] = [
   ]),
   ...cat('Everyday', [
     { id: 'coat', name: 'Coat check', aliases: ['cloakroom'], verdict: 'expected', flat: [1, 2, 2], unit: 'per item', qtyLabel: 'Items', source: COMMON, note: 'Even when the check itself is free.' },
-    { id: 'restroom', name: 'Restroom attendant', aliases: ['bathroom attendant'], verdict: 'optional', flat: [1, 2, 1], unit: 'per visit', qtyLabel: 'Visits', source: COMMON, note: 'Optional, more if they hand you a towel or supplies.' },
+    { id: 'restroom', name: 'Restroom attendant', aliases: ['bathroom attendant'], verdict: 'optional', flat: [1, 3, 1], unit: 'per visit', qtyLabel: 'Visits', source: EPI, sourceUrl: EPI_URL, note: 'Emily Post says 50 cents to $3, depending on the level of service.' },
     { id: 'stadium', name: 'Stadium / concert vendor', aliases: ['concessions', 'beer vendor', 'arena'], verdict: 'optional', flat: [1, 2, 1], unit: 'per order', qtyLabel: 'Orders', source: COMMON, note: 'Optional for seat-side vendors.' },
     { id: 'retail', name: 'Retail checkout / self-checkout', aliases: ['store', 'cashier', 'self checkout', 'kiosk', 'shop'], verdict: 'not', pct: [0, 0, 0], source: COMMON, note: 'Not expected, even when the screen asks.' },
     { id: 'doctor', name: 'Doctor / nurse / medical', aliases: ['dentist', 'hospital', 'nurse', 'clinic'], verdict: 'not', pct: [0, 0, 0], source: COMMON, note: 'Not expected, and often not allowed.' },

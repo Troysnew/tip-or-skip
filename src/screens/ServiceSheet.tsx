@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bars, Body, Btn, Card, H3, MoneyField, Stepper, TipButtons, type TipOption } from '../components/ui';
@@ -118,7 +118,13 @@ export function ServiceSheet({ serviceId, onClose, calc, setBill, onSendToCalcul
 
             <Card>
               <Body>{s.note}</Body>
-              <Body muted small>Guidance: {s.source}</Body>
+              {s.sourceUrl ? (
+                <Text accessibilityRole="link" onPress={() => Linking.openURL(s.sourceUrl!)} style={{ color: c.muted, fontSize: 13 }}>
+                  Guidance: <Text style={{ color: c.accent, fontWeight: '600', textDecorationLine: 'underline' }}>{s.source}</Text>
+                </Text>
+              ) : (
+                <Body muted small>Guidance: {s.source}. Source check pending.</Body>
+              )}
             </Card>
 
             {s.pew && (

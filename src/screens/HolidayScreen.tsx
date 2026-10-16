@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Alert, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Alert, Linking, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { font } from '../fonts';
 import { Text } from '../components/Text';
 import { Body, Btn, Card, Checkbox, Chip, H2, H3, ProTag } from '../components/ui';
-import { HOLIDAY_TEMPLATES } from '../data/holiday';
+import { HOLIDAY_SOURCE_URL, HOLIDAY_TEMPLATES } from '../data/holiday';
 import { money, parseAmount } from '../lib/tip';
 import { newId, type HolidayItem } from '../state';
 import { useStore } from '../store';
@@ -107,7 +107,9 @@ export function HolidayScreen() {
           />
           <Btn small title="Add" onPress={() => { if (custom.trim()) { add(custom.trim()); setCustom(''); } }} />
         </View>
-        <Body muted small>Suggestions are typical US guidance. The mail carrier rule comes from the Postal Service.</Body>
+        <Text accessibilityRole="link" onPress={() => Linking.openURL(HOLIDAY_SOURCE_URL)} style={{ color: c.muted, fontSize: 13 }}>
+          Suggested amounts: <Text style={{ color: c.accent, fontWeight: '600', textDecorationLine: 'underline' }}>Emily Post Institute holiday tipping guide</Text>
+        </Text>
       </Card>
 
       {holiday.year !== thisYear && (

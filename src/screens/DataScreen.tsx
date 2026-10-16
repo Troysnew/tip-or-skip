@@ -62,7 +62,11 @@ export function DataScreen() {
       </Card>
       <Card>
         <H3>Etiquette guidance</H3>
-        <Body>Amounts tagged Emily Post Institute or AHLA match those organizations' published guidance. Entries tagged Common US guidance are drafts that need an editorial source check before launch.</Body>
+        <Body>27 services and the holiday planner follow the Emily Post Institute's published guides, and each links to its page. Room service follows AHLA guidance. 33 services marked Common US guidance still need a source check before launch.</Body>
+        <View style={{ flexDirection: 'row', gap: 16 }}>
+          <Link url="https://emilypost.com/advice/general-tipping-guide">Tipping guide</Link>
+          <Link url="https://emilypost.com/advice/holiday-tipping-guide">Holiday guide</Link>
+        </View>
       </Card>
       <Card>
         <H3>In-app responses</H3>
