@@ -343,13 +343,23 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
             </View>
             <MoneyField label="Shared items" value={state.shared} onChange={(v) => patch({ shared: v })} />
           </View>
+          {itemResult.unassigned > 0.004 && bill > 0 && (
+            <View style={[st.leftBar, { backgroundColor: c.maybeBg }]} accessibilityLiveRegion="polite">
+              <Text style={{ color: c.maybe, fontSize: 15, fontWeight: '600' }}>{money(itemResult.unassigned)} left to assign</Text>
+              <Text style={{ color: c.maybe, fontSize: 14, lineHeight: 20 }}>
+                Split evenly for now. Add it to whoever ordered it, or put it in Shared items.
+              </Text>
+            </View>
+          )}
           <Card style={{ gap: 0, padding: 0, overflow: 'hidden' }}>
             {itemResult.shares.map((sh, i) => (
               <View key={state.people[i].id} style={[st.share, i > 0 && { borderTopWidth: 1, borderTopColor: c.line }]}>
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Text style={{ color: c.ink, fontWeight: '600', fontSize: 16 }}>{sh.name}</Text>
                   <Text style={{ color: c.muted, fontSize: 13, fontFamily: mono }}>
-                    {money(sh.food)} + {money(sh.tax)} tax + {money(sh.tip)} tip
+                    {sh.split > 0.004
+                      ? `${money(sh.own)} ordered + ${money(sh.split)} split + ${money(sh.tax)} tax + ${money(sh.tip)} tip`
+                      : `${money(sh.food)} + ${money(sh.tax)} tax + ${money(sh.tip)} tip`}
                   </Text>
                 </View>
                 <View style={{ alignItems: 'flex-end', gap: 4 }}>
@@ -374,9 +384,6 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
             <Text accessibilityRole="button" onPress={() => setEditingHandles(true)} style={{ color: c.accent, fontSize: 14, fontWeight: '600' }}>
               Edit how friends pay you
             </Text>
-          )}
-          {itemResult.unassigned > 0.004 && bill > 0 && (
-            <Text style={{ color: c.muted, fontSize: 14 }}>{money(itemResult.unassigned)} isn't assigned to anyone, so it's split evenly.</Text>
           )}
           {itemResult.over > 0.004 && (
             <Text style={{ color: c.warn, fontSize: 14 }}>The amounts add up to {money(itemResult.over)} more than the bill before tax. Check them.</Text>
@@ -472,6 +479,7 @@ const st = StyleSheet.create({
   remove: { width: space.target, height: space.target, alignItems: 'center', justifyContent: 'center' },
   removeDot: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   share: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 16 },
+  leftBar: { borderRadius: space.controlRadius, paddingHorizontal: 14, paddingVertical: 10, gap: 2 },
   reqPill: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1.5, borderRadius: 16, paddingHorizontal: 10, minHeight: 32 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   reset: { minHeight: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1.5, justifyContent: 'center' },

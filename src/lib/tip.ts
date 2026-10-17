@@ -56,6 +56,11 @@ export interface ItemizedInput {
 
 export interface ItemizedShare {
   name: string;
+  /** What this person ordered. */
+  own: number;
+  /** Their even part of shared items and anything not yet assigned to anyone. */
+  split: number;
+  /** own + split. */
   food: number;
   tax: number;
   tip: number;
@@ -84,7 +89,7 @@ export function computeItemized(i: ItemizedInput) {
     const t = tax * w;
     const tip = whole.tip * w;
     const total = Math.ceil((foods[k] + t + tip) * 100 - 1e-9) / 100;
-    return { name: p.name, food: foods[k], tax: t, tip, total };
+    return { name: p.name, own: p.amount, split: evenPart, food: foods[k], tax: t, tip, total };
   });
   const collected = shares.reduce((a, s) => a + s.total, 0);
   return { shares, unassigned, over, tip: whole.tip, total: whole.total, collected };
