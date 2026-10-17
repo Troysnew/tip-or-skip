@@ -72,7 +72,7 @@ const median = (a: number[]) => {
 // A price at the end of a row: optional sign, $, thousands, and 2 decimals, maybe a
 // trailing tax flag such as "T", "N", "SR" or "ZR", or a trailing minus for a discount.
 const AMOUNT_AT_END =
-  /(\(?-?\s?(?:[$S]|RM)?\s?-?\d{1,3}(?:[,\s]\d{3})*\s?[.,]\s?\d{2}\)?-?)\s*(?:[A-Z]{1,2}|\*)?\s*$/;
+  /(\(?-?\s?(?:\$\s?|S(?=\d)|RM\s?)?-?\d{1,3}(?:[,\s]\d{3})*\s?[.,]\s?\d{2}\)?-?)\s*(?:[A-Z]{1,2}|\*)?\s*$/;
 
 /** Fixes the usual reader slips in a price: O for 0, S for $, comma decimals, stray spaces. */
 function readAmount(raw: string): number | null {
@@ -257,7 +257,9 @@ function kindOf(name: string, amount: number | null): Kind {
   if (/total|amount due|amt due|balance due|\bdue\b|\bttl\b/.test(n) && !/tax\s*$|qty|items?\b|disc|saving/.test(n))
     return 'total';
   if (/\btax\b|\bgst\b|\bsst\b|\bvat\b|\bhst\b|\bpst\b|sales tax/.test(n)) return 'tax';
-  if (/cash|change|visa|master|amex|discover|debit|credit|card|\btender(ed)?\b|paid|payment|approv|auth|rounding|round adj|chg due|\btip\b/.test(n))
+  // Payment lines start with the payment word ("VISA 63.17", "Change 3.10"). Matching anywhere
+  // would drop real items such as "TRADING CARD" or "CASHEW CHICKEN".
+  if (/^[^a-z]*(cash|change|visa|mastercard|master card|amex|american express|discover|debit|credit|card|tender(ed)?|paid|payment|purchase|approv|auth|rounding|round adj|chg due|tip)\b/.test(n))
     return 'payment';
   if (/disc|coupon|promo|\bcomp\b|% off|voucher|happy hour/.test(n) || (amount !== null && amount < 0)) return 'discount';
   if (/\b(server|table|guests?|check|order|cashier|invoice|receipt|tel|phone|fax|www|thank|welcome|date|time|bill no|pax|covers?|closed|opened?)\b|\S@\S+\.[a-z]/.test(n))
@@ -320,7 +322,15 @@ export function parseReceipt(input: OcrLine[]): ParsedReceipt {
     if (kind === 'discount') {
       const v = -Math.abs(r.amount);
       discount += -v;
-      items.push({ name: cleanName(r.name).name || 'Discount', qty: 1, price: v });
+      const label = cleanName(r.name).name;
+      // A coupon printed right under its item ("ECPN-PICK N'" under "PICK N' PACK") comes off
+      // that item instead of showing as a separate line.
+      const last = items[items.length - 1];
+      if (last && last.price > 0 && couponFor(label, last.name)) {
+        last.price = round2(last.price + v);
+        continue;
+      }
+      items.push({ name: label || 'Discount', qty: 1, price: v });
       continue;
     }
     if (kind !== 'item') continue;
@@ -365,12 +375,29 @@ export function parseReceipt(input: OcrLine[]): ParsedReceipt {
     const bigger = after.find((x) => x.kind === 'total' && x.r.amount! >= subtotal!);
     total = bigger ? bigger.r.amount : total;
   }
+  // Some printers put the total's amount on a row of its own ("63.17" with no label, or a
+  // label the reader missed). Accept it when it equals subtotal + tax + service charge.
+  if (total === null && subtotal !== null) {
+    const expected = round2(subtotal + (tax ?? 0) + (serviceCharge ?? 0));
+    const bare = after.find((x) => Math.abs(x.r.amount! - expected) <= 0.02 && !/[a-z]{2}/i.test(x.r.name));
+    if (bare) total = bare.r.amount;
+  }
   const itemsSum = round2(items.reduce((a, i) => a + i.price, 0));
   if (subtotal === null && total !== null) subtotal = round2(total - (tax ?? 0) - (serviceCharge ?? 0));
   const near = (v: number | null) => v !== null && Math.abs(itemsSum - v) <= 0.02;
   const taxIncluded = !near(subtotal) && !!tax && near(total === null ? null : total - (serviceCharge ?? 0));
   const matches = !items.length || (subtotal === null && total === null) ? null : near(subtotal) || taxIncluded;
   return { items, discount: round2(discount), subtotal, tax, serviceCharge, total, itemsSum, matches, taxIncluded };
+}
+
+/** "ECPN-PICK N'" or "CPN WF ORG" names the item it discounts. */
+function couponFor(coupon: string, item: string): boolean {
+  const words = (t: string) => t.toUpperCase().replace(/^[A-Z]*C(?:OU)?PO?N\b[-\s:]*/, '').replace(/[^A-Z0-9 ]/g, ' ').split(/\s+/).filter(Boolean);
+  const c = words(coupon);
+  const it = words(item);
+  if (!c.length || !/c(ou)?po?n|coupon|disc/i.test(coupon)) return false;
+  // Every coupon word starts the matching word of the item: PICK N -> PICK N PACK.
+  return c.length <= it.length && c.every((w, k) => it[k].startsWith(w));
 }
 
 /** Several tax rows (state + city) add up; a repeated identical row is counted once. */
@@ -396,6 +423,8 @@ export interface ScanPerson {
 }
 
 export interface ScanTotals {
+  /** The receipt's printed total. When present it is the bill, so a missed line can't shrink it. */
+  total?: string;
   tax: string;
   serviceCharge: string;
   taxIncluded: boolean;
@@ -433,7 +462,9 @@ export function toSplit(items: ScanItem[], people: ScanPerson[], totals: ScanTot
   }
   const fix = (v: number) => (Math.abs(v) < 0.005 ? '' : round2(v).toFixed(2));
   return {
-    bill: round2(preTaxFood + service + tax).toFixed(2),
+    // The printed total wins. Anything not assigned to a person (a line the reader missed or
+    // the person deleted) is then split evenly by the calculator, and it says so.
+    bill: (num(totals.total ?? '') > 0 ? num(totals.total!) : round2(preTaxFood + service + tax)).toFixed(2),
     tax: tax ? tax.toFixed(2) : '',
     shared: fix(shared),
     people: people.map((p) => ({ id: p.id, name: p.name, amount: fix(amounts.get(p.id)!) })),

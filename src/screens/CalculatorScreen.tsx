@@ -9,7 +9,7 @@ import { byId, SERVICES } from '../data/services';
 import { font } from '../fonts';
 import { search } from '../lib/search';
 import { computeFlat, computeItemized, computePct, money, normLabel, parseAmount, tipOptions, type RoundMode, type TipBase } from '../lib/tip';
-import { applyPreset, newId, presetFrom, withService, type CalcState, type SplitMode } from '../state';
+import { applyPreset, blankPeople, initialCalc, newId, presetFrom, withService, type CalcState, type SplitMode } from '../state';
 import { useProGate, useStore } from '../store';
 import { mono, space, useColors } from '../theme';
 import { canScanReceipts, ReceiptScreen } from './ReceiptScreen';
@@ -97,9 +97,37 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
   const resultTip = flat ? flatResult.tip : itemized ? itemResult.tip : pctResult.tip;
   const resultTotal = flat ? null : itemized ? itemResult.total : pctResult.total;
 
+  // Anything the person entered that "Start over" would clear.
+  const dirty =
+    !!(state.bill || state.tax || state.shared || state.flatAmount || state.serviceId) ||
+    state.people.some((p) => p.name.trim() || p.amount) ||
+    state.split > 1 || state.qty > 1 || state.splitMode === 'items' || state.round !== 'none' || state.pct !== initialCalc.pct;
+
+  const startOver = () =>
+    Alert.alert('Start over?', 'This clears the bill, tax, tip, split, and the people you added.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Start over',
+        style: 'destructive',
+        onPress: () => {
+          setState({ ...initialCalc, people: blankPeople() });
+          setCustomOpen(false);
+          setQuery('');
+          flash('Cleared');
+        },
+      },
+    ]);
+
   return (
     <View style={{ gap: 16 }}>
-      <H2>Quick calculator</H2>
+      <View style={st.titleRow}>
+        <View style={{ flex: 1 }}><H2>Quick calculator</H2></View>
+        {dirty && (
+          <Pressable onPress={startOver} accessibilityRole="button" accessibilityLabel="Start over and clear the calculator" hitSlop={6} style={({ pressed }) => [st.reset, { borderColor: c.border, backgroundColor: c.surface }, pressed && { opacity: 0.75 }]}>
+            <Text style={{ color: c.ink, fontWeight: '600', fontSize: 14 }}>Start over</Text>
+          </Pressable>
+        )}
+      </View>
 
       {/* What's it for? */}
       <View>
@@ -389,6 +417,8 @@ const st = StyleSheet.create({
   remove: { width: space.target, height: space.target, alignItems: 'center', justifyContent: 'center' },
   removeDot: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   share: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 16 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  reset: { minHeight: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1.5, justifyContent: 'center' },
   scanBtn: { flexDirection: 'row', gap: 12, alignItems: 'center', borderWidth: 1.5, borderRadius: space.controlRadius, minHeight: 52, paddingHorizontal: 16, marginTop: -4 },
   saveBtn: { flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderRadius: space.controlRadius, minHeight: 52 },
 });

@@ -281,7 +281,7 @@ export function ReceiptScreen({ visible, people: startPeople, onClose, onUse }: 
                 <Btn
                   title="Use this receipt"
                   onPress={() => {
-                    onUse(toSplit(items, people, { tax, serviceCharge: service, taxIncluded }));
+                    onUse(toSplit(items, people, { total, tax, serviceCharge: service, taxIncluded }));
                     reset();
                   }}
                 />
