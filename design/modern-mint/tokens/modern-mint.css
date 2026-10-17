@@ -1,0 +1,66 @@
+:root, [data-theme="light"] {
+  --tos-background: #F6F8F6;
+  --tos-surface: #FFFFFF;
+  --tos-surfaceAlt: #E9EEEB;
+  --tos-text: #182322;
+  --tos-textSecondary: #53625D;
+  --tos-border: #7E8E86;
+  --tos-divider: #DAE2DD;
+  --tos-accent: #12745F;
+  --tos-onAccent: #FFFFFF;
+  --tos-selected: #182322;
+  --tos-onSelected: #ACF4CE;
+  --tos-result: #ACF4CE;
+  --tos-onResult: #182322;
+  --tos-focus: #12745F;
+  --tos-disabledBackground: #E3E8E5;
+  --tos-disabledText: #5B6963;
+  --tos-error: #A32C33;
+  --tos-onError: #FFFFFF;
+  --tos-suggestedBackground: #FFF0BF;
+  --tos-suggestedText: #6D4C00;
+  --tos-verdict-yes-background: #ACF4CE;
+  --tos-verdict-yes-text: #182322;
+  --tos-verdict-optional-background: #FFE4A0;
+  --tos-verdict-optional-text: #543C00;
+  --tos-verdict-skip-background: #DFE6E9;
+  --tos-verdict-skip-text: #293E47;
+  --tos-verdict-included-background: #DDEBFF;
+  --tos-verdict-included-text: #244A78;
+}
+[data-theme="dark"] {
+  --tos-background: #101A18;
+  --tos-surface: #1B2B27;
+  --tos-surfaceAlt: #253A33;
+  --tos-text: #F4F8F5;
+  --tos-textSecondary: #B5C8BE;
+  --tos-border: #708E80;
+  --tos-divider: #3B5248;
+  --tos-accent: #ACF4CE;
+  --tos-onAccent: #182322;
+  --tos-selected: #ACF4CE;
+  --tos-onSelected: #182322;
+  --tos-result: #ACF4CE;
+  --tos-onResult: #182322;
+  --tos-focus: #ACF4CE;
+  --tos-disabledBackground: #2B3E35;
+  --tos-disabledText: #B5C8BE;
+  --tos-error: #FFC2C4;
+  --tos-onError: #4E0D16;
+  --tos-suggestedBackground: #493B15;
+  --tos-suggestedText: #FFE4A0;
+  --tos-verdict-yes-background: #ACF4CE;
+  --tos-verdict-yes-text: #182322;
+  --tos-verdict-optional-background: #FFE4A0;
+  --tos-verdict-optional-text: #543C00;
+  --tos-verdict-skip-background: #DFE6E9;
+  --tos-verdict-skip-text: #293E47;
+  --tos-verdict-included-background: #DDEBFF;
+  --tos-verdict-included-text: #244A78;
+}
+@font-face { font-family: "Inter"; src: url("../fonts/Inter-body.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("../fonts/Inter-medium.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("../fonts/Inter-display.ttf") format("truetype"); font-style: normal; font-weight: 800; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("../fonts/Inter-logo.ttf") format("truetype"); font-style: normal; font-weight: 900; font-display: swap; }
+.tos-money { font-family: "Inter", sans-serif; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tos-focus:focus-visible { outline: 2px solid var(--tos-focus); outline-offset: 3px; }

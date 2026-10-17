@@ -49,7 +49,7 @@ export function Paywall() {
               accessibilityLabel="Tip or Skip Pro"
             />
             <View style={{ gap: 4 }}>
-              <Text style={[st.eyebrow, { color: c.brassText }]}>{paywall ? `${paywall} is a Pro feature` : 'Upgrade'}</Text>
+              <Text style={[st.eyebrow, { color: c.accent }]}>{paywall ? `${paywall} is a Pro feature` : 'Upgrade'}</Text>
               <Text style={[st.title, { color: c.ink }]}>Unlock Pro</Text>
               <Body muted>One payment of {PRO_PRICE}. No subscription.</Body>
             </View>

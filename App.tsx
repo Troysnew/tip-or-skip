@@ -3,7 +3,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { FONT_FILES } from './src/fonts';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from './src/components/Text';
 import { Icon, type IconName } from './src/components/icons';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,7 +17,7 @@ import { ServicesScreen } from './src/screens/ServicesScreen';
 import { ServiceSheet } from './src/screens/ServiceSheet';
 import { initialCalc, withService, type CalcState } from './src/state';
 import { StoreProvider, useStore } from './src/store';
-import { useColors } from './src/theme';
+import { space, useColors } from './src/theme';
 
 type Tab = 'calc' | 'services' | 'history' | 'holiday' | 'about';
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
@@ -68,13 +68,13 @@ function Main() {
       <StatusBar style="auto" />
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingHorizontal: Math.max(16, insets.left, insets.right), paddingTop: 16, paddingBottom: 32, gap: 16 }}
+        contentContainerStyle={{ paddingHorizontal: Math.max(space.screen, insets.left, insets.right), paddingTop: 12, paddingBottom: 32, gap: 18 }}
       >
-        <View>
-          <Text style={[st.tag, { color: c.muted }]}>Should I tip for this?</Text>
-          <Text style={[st.brand, { color: c.ink }]}>
-            Tip <Text style={{ color: c.brassText }}>or</Text> Skip
-          </Text>
+        <View style={st.appBar} accessibilityRole="header" accessibilityLabel="Tip or Skip">
+          <View style={[st.tile, { backgroundColor: c.tile }]}>
+            <Image source={require('./assets/brand/symbol-mint.png')} style={st.symbol} accessibilityIgnoresInvertColors />
+          </View>
+          <Text style={[st.appName, { color: c.ink }]}>Tip or Skip</Text>
         </View>
 
         {tab === 'calc' && <CalculatorScreen state={calc} setState={setCalc} onOpenService={setSheetId} />}
@@ -98,13 +98,15 @@ function Main() {
         </View>
       )}
 
-      <View style={[st.tabs, { backgroundColor: c.surface, borderTopColor: c.line, paddingBottom: insets.bottom }]} accessibilityRole="tablist">
+      <View style={[st.tabs, { backgroundColor: c.surface, borderTopColor: c.line, paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right }]} accessibilityRole="tablist">
         {TABS.map((t) => {
           const on = t.id === tab;
           return (
-            <Pressable key={t.id} onPress={() => setTab(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }} style={st.tab}>
-              <Icon name={t.icon} color={on ? c.accent : c.muted} />
-              <Text style={{ color: on ? c.accent : c.muted, fontSize: 11, fontWeight: '600' }}>{t.label}</Text>
+            <Pressable key={t.id} onPress={() => setTab(t.id)} accessibilityRole="tab" accessibilityLabel={t.label} accessibilityState={{ selected: on }} style={st.tab}>
+              <View style={[st.tabPill, on && { backgroundColor: c.sunk }]}>
+                <Icon name={t.icon} color={on ? c.accent : c.muted} />
+              </View>
+              <Text numberOfLines={1} style={{ color: on ? c.accent : c.muted, fontSize: 12, fontWeight: '600' }}>{t.label}</Text>
             </Pressable>
           );
         })}
@@ -124,9 +126,12 @@ function Main() {
 
 const st = StyleSheet.create({
   root: { flex: 1 },
-  tag: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
-  brand: { fontFamily: 'display', fontSize: 33, fontWeight: '800', letterSpacing: -0.6 },
+  appBar: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  tile: { width: 40, height: 40, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  symbol: { width: 36, height: 36 },
+  appName: { fontFamily: 'display', fontSize: 21, letterSpacing: -0.3 },
   tabs: { flexDirection: 'row', borderTopWidth: 1 },
-  tab: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 10, gap: 2 },
+  tab: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 8, gap: 3, minHeight: 60 },
+  tabPill: { width: 56, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   toast: { position: 'absolute', alignSelf: 'center', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 99 },
 });

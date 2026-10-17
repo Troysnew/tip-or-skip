@@ -2,7 +2,7 @@
   "expo": {
     "name": "Tip or Skip",
     "slug": "tip-or-skip",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "orientation": "portrait",
     "icon": "./assets/brand/app-icon.png",
     "userInterfaceStyle": "automatic",
@@ -18,7 +18,7 @@
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/brand/adaptive-foreground.png",
-        "backgroundColor": "#1F6B4A",
+        "backgroundColor": "#182322",
         "monochromeImage": "./assets/brand/monochrome.png"
       },
       "predictiveBackGestureEnabled": false
@@ -32,12 +32,12 @@
         "expo-splash-screen",
         {
           "image": "./assets/brand/splash.png",
-          "imageWidth": 220,
-          "backgroundColor": "#1F6B4A"
+          "imageWidth": 200,
+          "backgroundColor": "#182322"
         }
       ]
     ],
-    "primaryColor": "#1F6B4A",
+    "primaryColor": "#182322",
     "owner": "troysnew",
     "extra": {
       "eas": {

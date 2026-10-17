@@ -83,7 +83,7 @@ export function HistoryScreen() {
 
       {history.length === 0 ? (
         <Card>
-          <EmptyState icon="history" title="Your saved calculations will appear here." detail="On the calculator, tap Save to history after you work out a tip." />
+          <EmptyState icon="history" title="Your history starts here." detail="On the calculator, tap Save to history after you work out a tip." />
         </Card>
       ) : (
         <>

@@ -1,35 +1,25 @@
-// Brand fonts from the design review: Bricolage Grotesque (display), Inter (UI), JetBrains Mono (money).
-// All three are SIL Open Font License 1.1; the license files ship inside each @expo-google-fonts package.
-import { BricolageGrotesque_700Bold } from '@expo-google-fonts/bricolage-grotesque/700Bold';
-import { BricolageGrotesque_800ExtraBold } from '@expo-google-fonts/bricolage-grotesque/800ExtraBold';
-import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular';
-import { Inter_500Medium } from '@expo-google-fonts/inter/500Medium';
-import { Inter_600SemiBold } from '@expo-google-fonts/inter/600SemiBold';
-import { Inter_700Bold } from '@expo-google-fonts/inter/700Bold';
-import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono/500Medium';
-import { JetBrainsMono_700Bold } from '@expo-google-fonts/jetbrains-mono/700Bold';
-
+// Modern Mint typography: one Inter family, supplied as static files in assets/fonts (SIL OFL, see OFL.txt).
+//   Display  Inter ExtraBold 800  titles
+//   Logo     Inter Black 900      wordmark
+//   Body     Inter Regular 400    reading text
+//   Medium   Inter SemiBold 600   labels and emphasis
+//   Amount   Inter SemiBold 600   money, with tabular figures turned on in components/Text
 export const FONT_FILES = {
-  BricolageGrotesque_700Bold,
-  BricolageGrotesque_800ExtraBold,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  JetBrainsMono_500Medium,
-  JetBrainsMono_700Bold,
+  'Inter-Body': require('../assets/fonts/Inter-body.ttf'),
+  'Inter-Medium': require('../assets/fonts/Inter-medium.ttf'),
+  'Inter-Display': require('../assets/fonts/Inter-display.ttf'),
+  'Inter-Logo': require('../assets/fonts/Inter-logo.ttf'),
+  'Inter-Amount': require('../assets/fonts/Inter-amount.ttf'),
 };
 
-export type FontKind = 'body' | 'display' | 'mono';
+export type FontKind = 'body' | 'display' | 'mono' | 'logo';
 
-/** Pick the loaded font file for a family and weight. Custom fonts carry their weight in the file, not in fontWeight. */
+/** Pick the static font file for a role and weight. Each file carries its own weight, so fontWeight is never synthesized. */
 export function font(kind: FontKind, weight: number = 400): string {
-  if (kind === 'display') return weight >= 800 ? 'BricolageGrotesque_800ExtraBold' : 'BricolageGrotesque_700Bold';
-  if (kind === 'mono') return weight >= 700 ? 'JetBrainsMono_700Bold' : 'JetBrainsMono_500Medium';
-  if (weight >= 700) return 'Inter_700Bold';
-  if (weight >= 600) return 'Inter_600SemiBold';
-  if (weight >= 500) return 'Inter_500Medium';
-  return 'Inter_400Regular';
+  if (kind === 'logo') return 'Inter-Logo';
+  if (kind === 'display') return 'Inter-Display';
+  if (kind === 'mono') return 'Inter-Amount';
+  return weight >= 500 ? 'Inter-Medium' : 'Inter-Body';
 }
 
 export function weightOf(w: unknown): number {

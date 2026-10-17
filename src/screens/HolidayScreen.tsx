@@ -62,7 +62,7 @@ export function HolidayScreen() {
 
       {items.length === 0 && (
         <Card>
-          <EmptyState icon="holidays" title="Add someone to start your holiday plan." detail="Pick from the suggestions below or type a name." />
+          <EmptyState icon="holidays" title="A little planning goes a long way." detail="Add someone from the suggestions below, or type a name." />
         </Card>
       )}
       {items.length > 0 && (

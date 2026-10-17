@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { font } from '../fonts';
 import { Text } from '../components/Text';
-import { CATEGORY_ICON } from '../components/icons';
-import { Body, Btn, Card, Chip, H2, ServiceRow } from '../components/ui';
+import { CATEGORY_ICON, Icon } from '../components/icons';
+import { Body, Btn, Chip, H2, H3, ServiceRow } from '../components/ui';
 import { CATEGORIES, SERVICES } from '../data/services';
 import { closest, search } from '../lib/search';
 import { useColors } from '../theme';
@@ -23,19 +23,22 @@ export function ServicesScreen({ onOpenService, onRequest }: Props) {
   const q = query.trim();
 
   return (
-    <View style={{ gap: 12 }}>
+    <View style={{ gap: 14 }}>
       <View style={{ gap: 4 }}>
-        <H2>Should I tip for this?</H2>
-        <Body muted>Search or browse. Tap a service for the verdict and a quick calculator.</Body>
+        <H2>Find your answer</H2>
+        <Body muted>Search or browse. Tap a service for the verdict, the reason, and a quick calculator.</Body>
       </View>
-      <TextInput
-        value={query}
-        onChangeText={setQuery}
-        placeholder="Try movers, barista, hotel maid…"
-        placeholderTextColor={c.muted}
-        style={[st.search, { borderColor: c.line, backgroundColor: c.surface, color: c.ink }]}
-        accessibilityLabel="Search services"
-      />
+      <View style={[st.search, { borderColor: c.border, backgroundColor: c.surface }]}>
+        <Icon name="search" color={c.muted} size={20} />
+        <TextInput
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Search a service"
+          placeholderTextColor={c.muted}
+          style={[st.searchInput, { color: c.ink }]}
+          accessibilityLabel="Search services"
+        />
+      </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
         {CATEGORIES.map((k) => (
           <Chip key={k} label={k} active={k === cat} icon={k === 'All' ? undefined : CATEGORY_ICON[k]} onPress={() => setCat(k)} />
@@ -44,21 +47,22 @@ export function ServicesScreen({ onOpenService, onRequest }: Props) {
 
       {items.length ? (
         <>
-          <Text style={[st.count, { color: c.muted }]}>
-            {q ? `${items.length} match${items.length > 1 ? 'es' : ''}` : `${items.length} services${cat === 'All' ? '' : ` in ${cat}`}`}
-          </Text>
-          <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
-            {items.map((s, i) => <ServiceRow key={s.id} s={s} last={i === items.length - 1} onPress={() => onOpenService(s.id)} />)}
-          </Card>
+          <View style={st.guideHead}>
+            <H3>Tipping guide</H3>
+            <Text style={{ color: c.muted, fontSize: 14 }}>
+              {q ? `${items.length} match${items.length > 1 ? 'es' : ''}` : `${items.length} services${cat === 'All' ? '' : ` in ${cat}`}`}
+            </Text>
+          </View>
+          <View style={{ gap: 10 }}>
+            {items.map((s) => <ServiceRow key={s.id} s={s} variant="card" onPress={() => onOpenService(s.id)} />)}
+          </View>
         </>
       ) : (
         <>
-          <Card style={{ borderStyle: 'dashed' }}>
-            <Body>We don't have "{q}" yet. Closest matches:</Body>
-          </Card>
-          <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
-            {closest(SERVICES, q).map((s, i) => <ServiceRow key={s.id} s={s} last={i === 2} onPress={() => onOpenService(s.id)} />)}
-          </Card>
+          <Body>We don't have "{q}" yet. Closest matches:</Body>
+          <View style={{ gap: 10 }}>
+            {closest(SERVICES, q).map((s) => <ServiceRow key={s.id} s={s} variant="card" onPress={() => onOpenService(s.id)} />)}
+          </View>
           <Btn ghost title={`Request "${q}"`} onPress={() => onRequest(q)} />
         </>
       )}
@@ -67,6 +71,7 @@ export function ServicesScreen({ onOpenService, onRequest }: Props) {
 }
 
 const st = StyleSheet.create({
-  search: { borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 13, fontSize: 16, fontFamily: font('body') },
-  count: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.7 },
+  search: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 14, minHeight: 52 },
+  searchInput: { flex: 1, fontSize: 16, fontFamily: font('body'), paddingVertical: 12 },
+  guideHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 4 },
 });

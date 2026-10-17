@@ -1,0 +1,47 @@
+Mode,Pair,Foreground,Background,Ratio,Threshold,Result
+light,text on background,#182322,#F6F8F6,15.108,4.5,PASS
+light,textSecondary on background,#53625D,#F6F8F6,6.012,4.5,PASS
+light,accent on background,#12745F,#F6F8F6,5.334,4.5,PASS
+light,text on surface,#182322,#FFFFFF,16.125,4.5,PASS
+light,textSecondary on surface,#53625D,#FFFFFF,6.416,4.5,PASS
+light,accent on surface,#12745F,#FFFFFF,5.692,4.5,PASS
+light,text on surfaceAlt,#182322,#E9EEEB,13.74,4.5,PASS
+light,textSecondary on surfaceAlt,#53625D,#E9EEEB,5.467,4.5,PASS
+light,accent on surfaceAlt,#12745F,#E9EEEB,4.851,4.5,PASS
+light,onAccent on accent,#FFFFFF,#12745F,5.692,4.5,PASS
+light,onSelected on selected,#ACF4CE,#182322,12.735,4.5,PASS
+light,onResult on result,#182322,#ACF4CE,12.735,4.5,PASS
+light,disabledText on disabledBackground,#5B6963,#E3E8E5,4.647,4.5,PASS
+light,suggestedText on suggestedBackground,#6D4C00,#FFF0BF,6.881,4.5,PASS
+light,onError on error,#FFFFFF,#A32C33,7.082,4.5,PASS
+light,verdict yes,#182322,#ACF4CE,12.735,4.5,PASS
+light,verdict optional,#543C00,#FFE4A0,8.331,4.5,PASS
+light,verdict skip,#293E47,#DFE6E9,8.874,4.5,PASS
+light,verdict included,#244A78,#DDEBFF,7.482,4.5,PASS
+light,border on background,#7E8E86,#F6F8F6,3.225,3,PASS
+light,border on surface,#7E8E86,#FFFFFF,3.442,3,PASS
+light,focus on background,#12745F,#F6F8F6,5.334,3,PASS
+light,focus on surface,#12745F,#FFFFFF,5.692,3,PASS
+dark,text on background,#F4F8F5,#101A18,16.562,4.5,PASS
+dark,textSecondary on background,#B5C8BE,#101A18,10.119,4.5,PASS
+dark,accent on background,#ACF4CE,#101A18,14.02,4.5,PASS
+dark,text on surface,#F4F8F5,#1B2B27,13.783,4.5,PASS
+dark,textSecondary on surface,#B5C8BE,#1B2B27,8.421,4.5,PASS
+dark,accent on surface,#ACF4CE,#1B2B27,11.668,4.5,PASS
+dark,text on surfaceAlt,#F4F8F5,#253A33,11.314,4.5,PASS
+dark,textSecondary on surfaceAlt,#B5C8BE,#253A33,6.912,4.5,PASS
+dark,accent on surfaceAlt,#ACF4CE,#253A33,9.578,4.5,PASS
+dark,onAccent on accent,#182322,#ACF4CE,12.735,4.5,PASS
+dark,onSelected on selected,#182322,#ACF4CE,12.735,4.5,PASS
+dark,onResult on result,#182322,#ACF4CE,12.735,4.5,PASS
+dark,disabledText on disabledBackground,#B5C8BE,#2B3E35,6.494,4.5,PASS
+dark,suggestedText on suggestedBackground,#FFE4A0,#493B15,8.781,4.5,PASS
+dark,onError on error,#4E0D16,#FFC2C4,9.881,4.5,PASS
+dark,verdict yes,#182322,#ACF4CE,12.735,4.5,PASS
+dark,verdict optional,#543C00,#FFE4A0,8.331,4.5,PASS
+dark,verdict skip,#293E47,#DFE6E9,8.874,4.5,PASS
+dark,verdict included,#244A78,#DDEBFF,7.482,4.5,PASS
+dark,border on background,#708E80,#101A18,4.962,3,PASS
+dark,border on surface,#708E80,#1B2B27,4.129,3,PASS
+dark,focus on background,#ACF4CE,#101A18,14.02,3,PASS
+dark,focus on surface,#ACF4CE,#1B2B27,11.668,3,PASS

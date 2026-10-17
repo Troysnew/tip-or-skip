@@ -1,0 +1,30 @@
+{
+  "status": "PASS: export and contrast checks; app integration untested",
+  "version": "1.0.0",
+  "checks": [
+    "All SVGs parse; no embedded raster images in vector sources.",
+    "Required launcher/splash exports are 1024px and use specified opaque/alpha formats.",
+    "Adaptive and monochrome layers remain in the safe circle.",
+    "Play icon is 512px RGBA and below 1024KB; feature graphic is 1024x500 RGB.",
+    "All exported logos have transparency.",
+    "17 UI icons use a 24x24 viewBox.",
+    "All 46 foreground/background pairs pass their stated 4.5:1 text or 3:1 control threshold.",
+    "Font embedding license included."
+  ],
+  "adaptive_safe_area": {
+    "adaptive-foreground": {
+      "maximum_visible_radius_px": 312.54,
+      "safe_radius_px": 312.89
+    },
+    "monochrome": {
+      "maximum_visible_radius_px": 312.54,
+      "safe_radius_px": 312.89
+    }
+  },
+  "remaining": [
+    "Verify native application behavior, dynamic type and screen-reader semantics.",
+    "Inspect installed launcher and splash on target devices.",
+    "Replace four screenshot placeholders with actual app captures."
+  ],
+  "scope": "Contrast checks cover documented pairs, not every conceivable composition or a full accessibility audit."
+}

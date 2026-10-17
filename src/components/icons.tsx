@@ -1,12 +1,13 @@
 import React from 'react';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
-import type { Category, Verdict } from '../data/services';
+import type { Category } from '../data/services';
 
-// Interface icons from the Tip or Skip working brand kit (ui-icons/*.svg):
+// Interface icons from the Modern Mint kit (design/modern-mint/ui-icons/*.svg):
 // 24 × 24 viewBox, 1.8 unit strokes, round caps and joins, one color.
 export type IconName =
   | 'calculator' | 'services' | 'history' | 'holidays' | 'about'
-  | 'food-drink' | 'delivery' | 'travel' | 'personal-care' | 'home' | 'everyday';
+  | 'food-drink' | 'delivery' | 'travel' | 'personal-care' | 'home' | 'everyday'
+  | 'coffee' | 'check' | 'minus' | 'plus' | 'search' | 'more';
 
 function Shapes({ name }: { name: IconName }) {
   switch (name) {
@@ -32,6 +33,18 @@ function Shapes({ name }: { name: IconName }) {
       return <Path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-7h6v7" />;
     case 'everyday':
       return <Path d="M5 8h14l1 13H4ZM9 8V6a3 3 0 0 1 6 0v2" />;
+    case 'coffee':
+      return <Path d="M4 4h12v10a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5ZM16 5h2a3 3 0 0 1 0 6h-2M3 22h16" />;
+    case 'check':
+      return <Path d="m4 12 5 5L20 6" />;
+    case 'minus':
+      return <Path d="M5 12h14" />;
+    case 'plus':
+      return <Path d="M12 5v14M5 12h14" />;
+    case 'search':
+      return (<><Circle cx={10.5} cy={10.5} r={6.5} /><Path d="m15.5 15.5 5 5" /></>);
+    case 'more':
+      return (<><Circle cx={5} cy={12} r={1} /><Circle cx={12} cy={12} r={1} /><Circle cx={19} cy={12} r={1} /></>);
   }
 }
 
@@ -51,18 +64,3 @@ export const CATEGORY_ICON: Record<Category, IconName> = {
   Home: 'home',
   Everyday: 'everyday',
 };
-
-/** Verdict pill marks from the kit: check (Yes, tip), double chevron (Your call), dash (Skip it), equals (Included). */
-export function VerdictMark({ verdict, color, size = 12 }: { verdict: Verdict; color: string; size?: number }) {
-  const d = {
-    expected: 'M3 8.5 6.5 12 13 4.5',
-    optional: 'M3.5 4 7.5 8l-4 4M8.5 4l4 4-4 4',
-    not: 'M3.5 8h9',
-    included: 'M3.5 6h9M3.5 10.5h9',
-  }[verdict];
-  return (
-    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d={d} />
-    </Svg>
-  );
-}

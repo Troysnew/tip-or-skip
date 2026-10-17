@@ -1,27 +1,38 @@
 import { useColorScheme } from 'react-native';
 import type { Verdict } from './data/services';
 
-// Palette from the design team's brand review (Oct 16, 2026).
-// brass = decorative only (borders, chart bars). brassText = brass for text, which passes 4.5:1.
-// "Skip it" uses calm slate so it does not read as a warning.
+// Modern Mint tokens (design/modern-mint/tokens/modern-mint.json, release 1.0).
+// Mint is a surface in light mode and a foreground in dark mode; teal carries light-mode links and small text.
 const light = {
-  bg: '#EEF2EE', surface: '#FFFFFF', sunk: '#E3E9E4', line: '#CDD6CF',
-  ink: '#10291F', muted: '#50645A', accent: '#1F6B4A', accentInk: '#FFFFFF',
-  brass: '#C08A1E', brassText: '#855C0C',
-  yes: '#1F6B4A', yesBg: '#DCEFE4', maybe: '#8A5A00', maybeBg: '#F6EBCF',
-  no: '#4F5963', noBg: '#E6EAEE', info: '#2F5574', infoBg: '#DFE9F2', scrim: 'rgba(5,15,10,0.45)',
-  warn: '#8A3A2E',
-  border: '#708477', // interactive control outlines, 3:1 against surfaces
+  bg: '#F6F8F6', surface: '#FFFFFF', sunk: '#E9EEEB', line: '#DAE2DD', border: '#7E8E86',
+  ink: '#182322', muted: '#53625D',
+  accent: '#12745F', accentInk: '#FFFFFF',
+  selected: '#182322', onSelected: '#ACF4CE',
+  result: '#ACF4CE', onResult: '#182322',
+  suggestedBg: '#FFF0BF', suggestedText: '#6D4C00',
+  warn: '#A32C33',
+  tile: '#182322', // app-bar symbol tile
+  yes: '#182322', yesBg: '#ACF4CE',
+  maybe: '#543C00', maybeBg: '#FFE4A0',
+  no: '#293E47', noBg: '#DFE6E9',
+  info: '#244A78', infoBg: '#DDEBFF',
+  scrim: 'rgba(16,26,24,0.5)',
 };
 
 const dark: typeof light = {
-  bg: '#0D1712', surface: '#15251C', sunk: '#1C2D25', line: '#2C4237',
-  ink: '#E4EEE7', muted: '#ADBFB3', accent: '#5FC495', accentInk: '#0D1712',
-  brass: '#E0AE4A', brassText: '#E0AE4A',
-  yes: '#7AD4A6', yesBg: '#173B2A', maybe: '#E8C26E', maybeBg: '#3A2F14',
-  no: '#BBC5CE', noBg: '#253039', info: '#9CC3E6', infoBg: '#1B2E40', scrim: 'rgba(0,0,0,0.6)',
-  warn: '#F0A898',
-  border: '#668272',
+  bg: '#101A18', surface: '#1B2B27', sunk: '#253A33', line: '#3B5248', border: '#708E80',
+  ink: '#F4F8F5', muted: '#B5C8BE',
+  accent: '#ACF4CE', accentInk: '#182322',
+  selected: '#ACF4CE', onSelected: '#182322',
+  result: '#ACF4CE', onResult: '#182322',
+  suggestedBg: '#493B15', suggestedText: '#FFE4A0',
+  warn: '#FFC2C4',
+  tile: '#253A33',
+  yes: '#182322', yesBg: '#ACF4CE',
+  maybe: '#543C00', maybeBg: '#FFE4A0',
+  no: '#293E47', noBg: '#DFE6E9',
+  info: '#244A78', infoBg: '#DDEBFF',
+  scrim: 'rgba(0,0,0,0.6)',
 };
 
 export type Colors = typeof light;
@@ -39,6 +50,9 @@ export function verdictColors(c: Colors, v: Verdict) {
   }
 }
 
-/** fontFamily sentinels read by components/Text. TextInput needs a real file name: use font() from fonts.ts. */
+/** fontFamily role names read by components/Text. TextInput needs a real file name: use font() from fonts.ts. */
 export const mono = 'mono';
 export const display = 'display';
+
+/** Modern Mint layout values. */
+export const space = { screen: 20, controlRadius: 12, cardRadius: 20, target: 48 };
