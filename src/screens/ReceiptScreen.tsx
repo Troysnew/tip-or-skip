@@ -76,13 +76,27 @@ export function ReceiptScreen({ visible, people: startPeople, onClose, onUse }: 
       setPhase('reading');
 
       // Shrink big photos and bake in the rotation, so the reader sees an upright image.
+      // If that step fails on a device, read the original photo instead of giving up.
       const asset = res.assets[0];
-      const ctx = ImageManipulator.manipulate(asset.uri);
-      if (Math.max(asset.width, asset.height) > MAX_SIDE) {
-        ctx.resize(asset.height >= asset.width ? { height: MAX_SIDE, width: null } : { width: MAX_SIDE, height: null });
+      let uri = asset.uri;
+      try {
+        const ctx = ImageManipulator.manipulate(asset.uri);
+        if (Math.max(asset.width, asset.height) > MAX_SIDE) {
+          // Pass only the side being set. Android rejects an explicit null for the other one.
+          const size = asset.height >= asset.width ? { height: MAX_SIDE } : { width: MAX_SIDE };
+          ctx.resize(size as unknown as { width: number | null; height: number | null });
+        }
+        uri = (await (await ctx.renderAsync()).saveAsync({ format: SaveFormat.JPEG, compress: 0.9 })).uri;
+      } catch {
+        uri = asset.uri;
       }
-      const image = await (await ctx.renderAsync()).saveAsync({ format: SaveFormat.JPEG, compress: 0.9 });
-      const result = await readText(image.uri);
+
+      let result;
+      try {
+        result = await readText(uri);
+      } catch (e) {
+        throw new Error(`Couldn't read the text in that photo. ${e instanceof Error ? e.message : ''}`.trim());
+      }
       const parsed = parseReceipt(result.lines);
 
       if (!parsed.items.length && parsed.total === null) {
