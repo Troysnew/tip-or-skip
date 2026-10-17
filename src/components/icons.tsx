@@ -7,7 +7,8 @@ import type { Category } from '../data/services';
 export type IconName =
   | 'calculator' | 'services' | 'history' | 'holidays' | 'about'
   | 'food-drink' | 'delivery' | 'travel' | 'personal-care' | 'home' | 'everyday'
-  | 'coffee' | 'check' | 'minus' | 'plus' | 'search' | 'more';
+  | 'coffee' | 'check' | 'minus' | 'plus' | 'search' | 'more'
+  | 'camera' | 'photo' | 'receipt';
 
 function Shapes({ name }: { name: IconName }) {
   switch (name) {
@@ -37,6 +38,13 @@ function Shapes({ name }: { name: IconName }) {
       return <Path d="M4 4h12v10a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5ZM16 5h2a3 3 0 0 1 0 6h-2M3 22h16" />;
     case 'check':
       return <Path d="m4 12 5 5L20 6" />;
+    // Added for receipt scan, drawn to the kit's grid and stroke.
+    case 'camera':
+      return (<><Path d="M3 8a2 2 0 0 1 2-2h2.5l1.5-2.5h6L16.5 6H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" /><Circle cx={12} cy={13} r={3.75} /></>);
+    case 'photo':
+      return (<><Rect x={3} y={4} width={18} height={16} rx={2} /><Circle cx={9} cy={9.5} r={1.75} /><Path d="m3 17 5-5 4 4 3-3 6 6" /></>);
+    case 'receipt':
+      return <Path d="M5 3h14v18l-2.33-1.5L14.33 21 12 19.5 9.67 21 7.33 19.5 5 21ZM8.5 8h7M8.5 12h7M8.5 16h4" />;
     case 'minus':
       return <Path d="M5 12h14" />;
     case 'plus':

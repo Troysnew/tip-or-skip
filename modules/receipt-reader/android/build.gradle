@@ -1,0 +1,23 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'expo.modules.receiptreader'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.receiptreader"
+  defaultConfig {
+    versionCode 1
+    versionName "1.0.0"
+  }
+  lintOptions {
+    abortOnError false
+  }
+}
+
+dependencies {
+  // Google ML Kit text recognition with the model bundled in the app: on-device, offline, free.
+  implementation 'com.google.mlkit:text-recognition:16.0.1'
+}

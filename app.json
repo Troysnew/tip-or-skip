@@ -2,7 +2,7 @@
   "expo": {
     "name": "Tip or Skip",
     "slug": "tip-or-skip",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "orientation": "portrait",
     "icon": "./assets/brand/app-icon.png",
     "userInterfaceStyle": "automatic",
@@ -34,6 +34,14 @@
           "image": "./assets/brand/splash.png",
           "imageWidth": 200,
           "backgroundColor": "#182322"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Tip or Skip uses the camera to read the receipt you photograph, so it can split the check by item. The photo is read on your phone and is not uploaded.",
+          "photosPermission": "Tip or Skip reads the receipt photo you choose, so it can split the check by item. The photo is read on your phone and is not uploaded.",
+          "microphonePermission": false
         }
       ]
     ],

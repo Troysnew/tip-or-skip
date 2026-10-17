@@ -12,7 +12,7 @@ const FEATURES: { title: string; line: string; soon?: boolean }[] = [
   { title: 'Saved presets', line: 'One tap for "my usual 20%" or "split with the team."' },
   { title: 'Split by item', line: 'Each person pays for what they ordered, with tax and tip divided fairly.' },
   { title: 'Holiday tipping planner', line: 'Who to thank, what is typical, and a budget you can check off.' },
-  { title: 'Receipt scan', line: 'Point the camera at the check to fill in the bill and tax.', soon: true },
+  { title: 'Receipt scan', line: 'Snap the check, tap who had what, and every share is worked out. Read on your phone, never uploaded.' },
 ];
 
 export function Paywall() {

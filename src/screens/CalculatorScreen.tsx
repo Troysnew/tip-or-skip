@@ -12,6 +12,7 @@ import { computeFlat, computeItemized, computePct, money, normLabel, parseAmount
 import { applyPreset, newId, presetFrom, withService, type CalcState, type SplitMode } from '../state';
 import { useProGate, useStore } from '../store';
 import { mono, space, useColors } from '../theme';
+import { canScanReceipts, ReceiptScreen } from './ReceiptScreen';
 
 /** Default tip cards when no service is picked (Modern Mint: three cards, then Custom tip / No tip). */
 const DEFAULT_PCTS = [15, 18, 20];
@@ -29,6 +30,7 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
   const [query, setQuery] = useState('');
   const [naming, setNaming] = useState<string | null>(null);
   const [customOpen, setCustomOpen] = useState(false);
+  const [scanning, setScanning] = useState(false);
 
   const svc = state.serviceId ? byId(state.serviceId) : undefined;
   const flat = !!svc?.flat;
@@ -203,6 +205,16 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
       ) : (
         <>
           <BigMoneyField label="Bill amount" value={state.bill} onChange={(v) => patch({ bill: v })} />
+          <Pressable
+            onPress={() => gate('Receipt scan', () => (canScanReceipts ? setScanning(true) : flash('Update the app to scan receipts')))}
+            accessibilityRole="button"
+            accessibilityLabel="Scan receipt and split by item"
+            style={({ pressed }) => [st.scanBtn, { borderColor: c.border, backgroundColor: c.surface }, pressed && { opacity: 0.75 }]}
+          >
+            <Icon name="camera" color={c.accent} size={22} />
+            <Text style={{ color: c.ink, fontWeight: '600', fontSize: 16, flex: 1 }}>Scan receipt and split by item</Text>
+            {!pro && <ProTag />}
+          </Pressable>
           <TipButtons options={pctOptions} selected={isCustomPct ? null : state.pct} onSelect={(v) => { setCustomOpen(false); patch({ pct: v }); }} />
           <View style={st.two}>
             <OptionButton label="Custom tip" on={isCustomPct} onPress={() => setCustomOpen(true)} />
@@ -339,6 +351,26 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
       </Pressable>
 
       {!svc && <Text style={{ color: c.muted, fontSize: 14, textAlign: 'center' }}>Not sure what to tip? Type what it's for in the search box above.</Text>}
+
+      <ReceiptScreen
+        visible={scanning}
+        people={state.people.map((p) => ({ id: p.id, name: p.name }))}
+        onClose={() => setScanning(false)}
+        onUse={(r) => {
+          setState((s) => ({
+            ...s,
+            bill: r.bill,
+            tax: r.tax,
+            shared: r.shared,
+            people: r.people,
+            splitMode: 'items',
+            pct: r.tipIncluded ? 0 : s.pct,
+          }));
+          setCustomOpen(false);
+          setScanning(false);
+          flash(r.tipIncluded ? 'Receipt added. A service charge is already on it.' : 'Receipt added. Each share is below.');
+        }}
+      />
     </View>
   );
 }
@@ -357,5 +389,6 @@ const st = StyleSheet.create({
   remove: { width: space.target, height: space.target, alignItems: 'center', justifyContent: 'center' },
   removeDot: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   share: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 16 },
+  scanBtn: { flexDirection: 'row', gap: 12, alignItems: 'center', borderWidth: 1.5, borderRadius: space.controlRadius, minHeight: 52, paddingHorizontal: 16, marginTop: -4 },
   saveBtn: { flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderRadius: space.controlRadius, minHeight: 52 },
 });
