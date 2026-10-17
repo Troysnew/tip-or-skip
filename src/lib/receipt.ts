@@ -252,6 +252,9 @@ function kindOf(name: string, amount: number | null): Kind {
     .replace(/\bln(c|cl)/g, 'in$1');
   if (/\d{1,2}\s?%\s*[=:-]|suggested|tip guide|gratuity guide|for your convenience/.test(n)) return 'tipguide';
   if (/sub\s?-?\s?tot|\bsub[\s-]?\S{1,3}tal\b|subtl|sub ttl|s\/total/.test(n)) return 'subtotal';
+  // Restaurants often label the subtotal by what it covers: "FOOD 64.90", "BEVERAGE".
+  if (amount !== null && /^[^a-z]*(food|food total|food & bev(erage)?|food and bev(erage)?|beverages?|merchandise|sales|net sales|items? total)[^a-z]*$/.test(n))
+    return 'subtotal';
   if (/total/.test(n) && /excl|before tax|pre-?tax|w\/o tax/.test(n)) return 'subtotal';
   if (/gratuity|grat\b|service ch|service fee|svc|serv\.? ?chg|srv chg|s\/?charge/.test(n)) return 'service';
   if (/total|amount due|amt due|balance due|\bdue\b|\bttl\b/.test(n) && !/tax\s*$|qty|items?\b|disc|saving/.test(n))
@@ -274,6 +277,8 @@ function cleanName(raw: string): { name: string; qty: number } {
   let qty = 1;
   // Long product codes at the start.
   s = s.replace(/^\d{5,}\s+/, '');
+  // A quantity of 1 often reads as "l", "I" or "|": "l SALAD", "I LEMONADE".
+  s = s.replace(/^[lI|]\s+(?=[A-Za-z])/, '1 ');
   // "2 Burger", "2x Burger", "2 @ Burger"
   // The reader sometimes drops the space: "3Mac & Cheese". Units like "12oz Steak" stay names.
   let m = s.match(/^(\d{1,2})\s?[xX@*]?\s+(?=\D)/) ?? s.match(/^([1-9])(?=[A-Za-z])(?!oz|pc|lb|in\b|pk|ct\b)/i);
@@ -334,7 +339,18 @@ export function parseReceipt(input: OcrLine[]): ParsedReceipt {
       continue;
     }
     if (kind !== 'item') continue;
-    if (r.amount === 0) continue; // free add-ons such as "No onion 0.00"
+    // An unlabeled or oddly labeled subtotal: the amount equals everything above it and the
+    // next priced row is tax, a service charge or the total.
+    const running = items.reduce((a, i) => a + i.price, 0);
+    if (items.length >= 2 && Math.abs(r.amount - running) <= 0.02) {
+      const next = rows.slice(k + 1).findIndex((x) => x.amount !== null);
+      const nk = next < 0 ? -1 : k + 1 + next;
+      if (nk >= 0 && ['tax', 'service', 'total', 'subtotal'].includes(kinds[nk])) {
+        kinds[k] = 'subtotal';
+        end = k;
+        break;
+      }
+    }
 
     let { name, qty } = cleanName(r.name);
     const prevRow = rows[k - 1];

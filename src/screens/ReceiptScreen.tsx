@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
@@ -27,6 +27,8 @@ type Phase = 'choose' | 'reading' | 'review';
 
 /** Longest side of the photo handed to the reader. Enough for small receipt print. */
 const MAX_SIDE = 2400;
+/** Small images are enlarged to this long side before reading. */
+const MIN_SIDE = 1800;
 
 const num = (s: string) => {
   const v = parseFloat((s || '').replace(/[^0-9.-]/g, ''));
@@ -48,6 +50,17 @@ export function ReceiptScreen({ visible, people: startPeople, onClose, onUse }: 
   const [service, setService] = useState('');
   const [total, setTotal] = useState('');
   const [taxIncluded, setTaxIncluded] = useState(false);
+  const [typing, setTyping] = useState(false);
+
+  // Hide the bottom buttons while the keyboard is up so the list keeps its room.
+  useEffect(() => {
+    const show = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', () => setTyping(true));
+    const hide = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => setTyping(false));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
 
   const reset = () => {
     setPhase('choose');
@@ -81,9 +94,13 @@ export function ReceiptScreen({ visible, people: startPeople, onClose, onUse }: 
       let uri = asset.uri;
       try {
         const ctx = ImageManipulator.manipulate(asset.uri);
-        if (Math.max(asset.width, asset.height) > MAX_SIDE) {
+        const long = Math.max(asset.width, asset.height);
+        // Shrink big photos; enlarge small images (a screenshot or a web picture) so the
+        // reader gets enough pixels per letter.
+        const target = long > MAX_SIDE ? MAX_SIDE : long > 0 && long < MIN_SIDE ? MIN_SIDE : 0;
+        if (target) {
           // Pass only the side being set. Android rejects an explicit null for the other one.
-          const size = asset.height >= asset.width ? { height: MAX_SIDE } : { width: MAX_SIDE };
+          const size = asset.height >= asset.width ? { height: target } : { width: target };
           ctx.resize(size as unknown as { width: number | null; height: number | null });
         }
         uri = (await (await ctx.renderAsync()).saveAsync({ format: SaveFormat.JPEG, compress: 0.9 })).uri;
@@ -275,7 +292,7 @@ export function ReceiptScreen({ visible, people: startPeople, onClose, onUse }: 
                 </Text>
               )}
             </ScrollView>
-            <View style={[st.footer, { paddingBottom: insets.bottom + 12, borderTopColor: c.line, backgroundColor: c.bg }]}>
+            {!typing && <View style={[st.footer, { paddingBottom: insets.bottom + 12, borderTopColor: c.line, backgroundColor: c.bg }]}>
               <View style={{ flex: 1 }}><Btn ghost title="Retake" onPress={reset} /></View>
               <View style={{ flex: 2 }}>
                 <Btn
@@ -286,7 +303,7 @@ export function ReceiptScreen({ visible, people: startPeople, onClose, onUse }: 
                   }}
                 />
               </View>
-            </View>
+            </View>}
           </>
         )}
       </KeyboardAvoidingView>
