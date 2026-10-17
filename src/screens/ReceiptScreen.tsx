@@ -139,8 +139,9 @@ export function ReceiptScreen({ visible, people: startPeople, onClose, onUse }: 
   // Live check as people fix lines: do the items add up to what the receipt says?
   const check = useMemo(() => {
     const sum = items.reduce((a, i) => a + num(i.price), 0);
-    const target = taxIncluded ? num(total) - num(service) : num(subtotal) || num(total) - num(tax) - num(service);
-    if (!target) return { sum, target: null as number | null, ok: null as boolean | null };
+    const target = taxIncluded ? num(total) - num(service) : num(subtotal) || (num(total) > 0 ? num(total) - num(tax) - num(service) : 0);
+    // Nothing to check against (no subtotal or total found): don't show a made-up number.
+    if (!(target > 0)) return { sum, target: null as number | null, ok: null as boolean | null };
     return { sum, target, ok: Math.abs(sum - target) <= 0.02 };
   }, [items, subtotal, tax, service, total, taxIncluded]);
 

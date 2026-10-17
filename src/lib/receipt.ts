@@ -319,14 +319,14 @@ export function parseReceipt(input: OcrLine[]): ParsedReceipt {
   const stop = firstOf(['subtotal', 'total', 'tax', 'service']);
   const subRow = firstOf(['subtotal']);
 
-  const collect = (endAt: number, fees: boolean) => {
+  const collect = (endAt: number, fees: boolean, start = 0, loose = false) => {
     let end = endAt < 0 ? rows.length : endAt;
     // Where item names usually start, to tell indented add-ons from items.
     const priced = rows.slice(0, end).filter((r, k) => r.amount !== null && kinds[k] === 'item');
     const itemLeft = median(priced.map((r) => r.left));
     const items: ReceiptItem[] = [];
     let discount = 0;
-    for (let k = 0; k < end; k++) {
+    for (let k = start; k < end; k++) {
       const r = rows[k];
       if (r.amount === null) continue;
       const kind = kinds[k];
@@ -375,7 +375,12 @@ export function parseReceipt(input: OcrLine[]): ParsedReceipt {
         items.push({ name: c.name, qty: c.qty, price: r.amount });
         continue;
       }
-      if (!/[a-z]/i.test(name)) continue;
+      if (!/[a-z]/i.test(name)) {
+        // In arithmetic mode the amounts are already proven to add up, so a price whose name
+        // landed on another line is still an item; the person can name it on the review screen.
+        if (loose && r.amount > 0) items.push({ name: 'Item', qty: 1, price: r.amount });
+        continue;
+      }
 
       // Priced add-ons: "+ Bacon 2.00", "Add bacon 2.00", or indented under the item.
       const addOn = /^\s*[+>]|^add\b|^extra\b|^sub\b/i.test(r.name) || (items.length > 0 && r.left > itemLeft + 1.5 * unit);
@@ -398,7 +403,8 @@ export function parseReceipt(input: OcrLine[]): ParsedReceipt {
     const withFees = collect(subRow, true);
     if (Math.abs(sum(withFees) - subAmt) <= 0.02 && Math.abs(sum(picked) - subAmt) > 0.02) picked = withFees;
   }
-  const { items, discount, end } = picked;
+  let { items, discount } = picked;
+  const { end } = picked;
 
   const after = rows.map((r, k) => ({ r, kind: kinds[k] })).slice(end).filter((x) => x.r.amount !== null);
   const first = (kind: Kind) => after.find((x) => x.kind === kind)?.r.amount ?? null;
@@ -444,7 +450,90 @@ export function parseReceipt(input: OcrLine[]): ParsedReceipt {
   const near = (v: number | null) => v !== null && Math.abs(itemsSum - v) <= 0.02;
   const taxIncluded = !near(subtotal) && !!tax && near(total === null ? null : total - (serviceCharge ?? 0));
   const matches = !items.length || (subtotal === null && total === null) ? null : near(subtotal) || taxIncluded;
+  // Reconcile by arithmetic when the labels didn't line up (crumpled paper, a column of amounts
+  // printed half a line off its labels, a label the reader missed). Look for the chain every
+  // receipt obeys: consecutive items add up to the next amount (the subtotal), and the subtotal
+  // plus the charges after it add up to a later amount (the total).
+  // Also when the summary itself doesn't add up: labels shifted against their amounts can make
+  // the items match while tax and total are swapped around.
+  const consistent =
+    subtotal !== null && total !== null && total >= subtotal - 0.02 &&
+    Math.abs(subtotal + (tax ?? 0) + (serviceCharge ?? 0) - total) <= 0.05;
+  if (matches !== true || (!consistent && !taxIncluded)) {
+    const chain = findChain(rows, kinds);
+    if (chain) {
+      const c2 = collect(chain.subRow, true, chain.startRow, true);
+      const sum = round2(c2.items.reduce((a, i) => a + i.price, 0));
+      if (Math.abs(sum - chain.subtotal) <= 0.02) {
+        items = c2.items;
+        discount = c2.discount;
+        const svc = serviceFromChain(rows, kinds, chain);
+        const gap = round2(chain.total - chain.subtotal - (svc ?? 0));
+        return {
+          items, discount: round2(discount), subtotal: chain.subtotal, tax: gap > 0 ? gap : null, serviceCharge: svc,
+          total: chain.total, itemsSum: sum, matches: true, taxIncluded: false,
+        };
+      }
+    }
+  }
   return { items, discount: round2(discount), subtotal, tax, serviceCharge, total, itemsSum, matches, taxIncluded };
+}
+
+/**
+ * Finds items -> subtotal -> total by arithmetic alone, ignoring labels. Among the priced rows in
+ * reading order, it looks for a run a[s..p-1] that sums to a[p] (the subtotal) and a run
+ * a[p+1..q-1] (taxes and fees) with a[p] + that run = a[q] (the total). The earliest start and
+ * then the earliest subtotal win, so every item above is kept.
+ */
+function findChain(rows: Row[], kinds: Kind[]) {
+  // Payment lines (cash tendered, change, card) and suggested-tip lines never take part.
+  const a = rows
+    .map((r, k) => ({ k, v: r.amount }))
+    .filter((x): x is { k: number; v: number } => x.v !== null && kinds[x.k] !== 'payment' && kinds[x.k] !== 'tipguide');
+  const eq = (x: number, y: number) => Math.abs(x - y) <= 0.02;
+  for (let s = 0; s < a.length; s++) {
+    let run = 0;
+    for (let p = s + 1; p < a.length; p++) {
+      run += a[p - 1].v;
+      if (!eq(run, a[p].v) || a[p].v <= 0) continue;
+      // The total: a nearby amount equal to the subtotal plus some of the other nearby amounts
+      // (tax, fees, service charge), in any order, since misaligned rows can swap them.
+      const near = a.slice(p + 1, p + 7);
+      for (let qi = 0; qi < near.length; qi++) {
+        const diff = near[qi].v - a[p].v;
+        if (diff <= 0.005 || diff > a[p].v * 0.5) continue;
+        const others = near.filter((_, i) => i !== qi);
+        for (let m = 1; m < 1 << others.length; m++) {
+          const pick = others.filter((_, i) => m & (1 << i));
+          if (pick.some((x) => x.v <= 0)) continue;
+          if (eq(pick.reduce((t, x) => t + x.v, 0), diff)) {
+            return { startRow: a[s].k, subRow: a[p].k, totalRow: Math.max(near[qi].k, ...pick.map((x) => x.k)), subtotal: a[p].v, total: near[qi].v, extras: pick.map((x) => x.v) };
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Which of the charges between subtotal and total is a service charge, if the receipt has one.
+ * The labels may sit next to the wrong amounts, so: a printed percentage ("Gratuity 18%") picks
+ * the charge equal to that share of the subtotal; without one, a gratuity is the larger charge,
+ * since it is almost always more than the tax.
+ */
+function serviceFromChain(rows: Row[], kinds: Kind[], chain: { subRow: number; totalRow: number; subtotal: number; extras: number[] }): number | null {
+  const region = rows.slice(Math.max(0, chain.subRow - 1), chain.totalRow + 1).filter((_, i) => kinds[Math.max(0, chain.subRow - 1) + i] === 'service');
+  if (!region.length || !chain.extras.length) return null;
+  for (const r of region) {
+    const pct = r.text.match(/(\d{1,2}(?:\.\d)?)\s?%/);
+    if (pct) {
+      const want = (chain.subtotal * parseFloat(pct[1])) / 100;
+      const hit = chain.extras.find((v) => Math.abs(v - want) <= 0.02);
+      if (hit !== undefined) return hit;
+    }
+  }
+  return chain.extras.length >= 2 ? Math.max(...chain.extras) : null;
 }
 
 /** "ECPN-PICK N'" or "CPN WF ORG" names the item it discounts. */
