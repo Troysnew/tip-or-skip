@@ -13,6 +13,8 @@ import { applyPreset, blankPeople, initialCalc, newId, presetFrom, withService, 
 import { useProGate, useStore } from '../store';
 import { mono, space, useColors } from '../theme';
 import { canScanReceipts, ReceiptScreen } from './ReceiptScreen';
+import { HandlesSheet, PaySheet, useRequest } from './SettleUp';
+import { hasHandles } from '../lib/pay';
 
 /** Default tip cards when no service is picked (Modern Mint: three cards, then Custom tip / No tip). */
 const DEFAULT_PCTS = [15, 18, 20];
@@ -25,12 +27,15 @@ interface Props {
 
 export function CalculatorScreen({ state, setState, onOpenService }: Props) {
   const c = useColors();
-  const { pro, presets, setPresets, setHistory, flash, openPaywall } = useStore();
+  const { pro, presets, setPresets, setHistory, flash, openPaywall, payHandles } = useStore();
   const gate = useProGate();
   const [query, setQuery] = useState('');
   const [naming, setNaming] = useState<string | null>(null);
   const [customOpen, setCustomOpen] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [editingHandles, setEditingHandles] = useState(false);
+  const { request, sheet: requestSheet } = useRequest();
 
   const svc = state.serviceId ? byId(state.serviceId) : undefined;
   const flat = !!svc?.flat;
@@ -96,6 +101,10 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
   // Numbers shown in the mint result card.
   const resultTip = flat ? flatResult.tip : itemized ? itemResult.tip : pctResult.tip;
   const resultTotal = flat ? null : itemized ? itemResult.total : pctResult.total;
+
+  // What "Pay" uses: your share when the bill is split evenly, otherwise the whole amount.
+  const payAmount = flat ? (state.split > 1 ? flatResult.each : flatResult.tip) : itemized ? itemResult.total : state.split > 1 ? pctResult.each : pctResult.total;
+  const forLabel = svc?.name ?? 'the bill';
 
   // Anything the person entered that "Start over" would clear.
   const dirty =
@@ -267,6 +276,13 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
       </View>
       {!flat && bill === 0 && <Text style={{ color: c.muted, fontSize: 14, marginTop: -6 }}>Enter the bill to see your tip.</Text>}
 
+      {/* Settle up: Pay is free; requests are Pro. */}
+      {payAmount > 0 && (
+        <View style={st.two}>
+          <View style={{ flex: 1 }}><Btn title={`Pay ${money(payAmount)}`} onPress={() => setPaying(true)} /></View>
+        </View>
+      )}
+
       {/* Split */}
       {!flat && (
         <Segmented<SplitMode>
@@ -330,10 +346,29 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
                     {money(sh.food)} + {money(sh.tax)} tax + {money(sh.tip)} tip
                   </Text>
                 </View>
-                <Text style={{ color: c.ink, fontFamily: mono, fontSize: 22 }}>{money(sh.total)}</Text>
+                <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                  <Text style={{ color: c.ink, fontFamily: mono, fontSize: 22 }}>{money(sh.total)}</Text>
+                  {sh.total > 0 && (
+                    <Pressable
+                      onPress={() => request({ name: state.people[i].name.trim(), amount: sh.total, label: forLabel, parts: { food: sh.food, tax: sh.tax, tip: sh.tip } })}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Request ${money(sh.total)} from ${sh.name}`}
+                      hitSlop={8}
+                      style={({ pressed }) => [st.reqPill, { borderColor: c.border, backgroundColor: c.surface }, pressed && { opacity: 0.75 }]}
+                    >
+                      <Text style={{ color: c.ink, fontSize: 13, fontWeight: '600' }}>Request</Text>
+                      {!pro && <ProTag />}
+                    </Pressable>
+                  )}
+                </View>
               </View>
             ))}
           </Card>
+          {pro && hasHandles(payHandles) && (
+            <Text accessibilityRole="button" onPress={() => setEditingHandles(true)} style={{ color: c.accent, fontSize: 14, fontWeight: '600' }}>
+              Edit how friends pay you
+            </Text>
+          )}
           {itemResult.unassigned > 0.004 && bill > 0 && (
             <Text style={{ color: c.muted, fontSize: 14 }}>{money(itemResult.unassigned)} isn't assigned to anyone, so it's split evenly.</Text>
           )}
@@ -352,6 +387,16 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
               <Text style={{ color: c.muted, fontSize: 16 }}>Each person</Text>
               <Text style={{ color: c.ink, fontFamily: mono, fontSize: 34, lineHeight: 40 }}>{money(flat ? flatResult.each : pctResult.each)}</Text>
             </View>
+          )}
+          {state.split > 1 && (flat ? flatResult.each : pctResult.each) > 0 && (
+            <Pressable
+              onPress={() => request({ amount: flat ? flatResult.each : pctResult.each, label: forLabel })}
+              accessibilityRole="button"
+              style={({ pressed }) => [st.saveBtn, { borderColor: c.border, backgroundColor: c.surface }, pressed && { opacity: 0.75 }]}
+            >
+              <Text style={{ color: c.ink, fontWeight: '600', fontSize: 16 }}>Request {money(flat ? flatResult.each : pctResult.each)} from each</Text>
+              {!pro && <ProTag />}
+            </Pressable>
           )}
           {!flat && state.split > 1 && Math.abs(pctResult.groupPays - pctResult.total) > 0.004 && (
             <Text style={{ color: c.muted, fontSize: 14 }}>Each share is rounded up to the cent, so the group covers {money(pctResult.groupPays)}.</Text>
@@ -379,6 +424,10 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
       </Pressable>
 
       {!svc && <Text style={{ color: c.muted, fontSize: 14, textAlign: 'center' }}>Not sure what to tip? Type what it's for in the search box above.</Text>}
+
+      <PaySheet visible={paying} amount={payAmount} onClose={() => setPaying(false)} />
+      <HandlesSheet visible={editingHandles} onClose={() => setEditingHandles(false)} />
+      {requestSheet}
 
       <ReceiptScreen
         visible={scanning}
@@ -417,6 +466,7 @@ const st = StyleSheet.create({
   remove: { width: space.target, height: space.target, alignItems: 'center', justifyContent: 'center' },
   removeDot: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   share: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 16 },
+  reqPill: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1.5, borderRadius: 16, paddingHorizontal: 10, minHeight: 32 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   reset: { minHeight: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1.5, justifyContent: 'center' },
   scanBtn: { flexDirection: 'row', gap: 12, alignItems: 'center', borderWidth: 1.5, borderRadius: space.controlRadius, minHeight: 52, paddingHorizontal: 16, marginTop: -4 },

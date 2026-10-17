@@ -11,6 +11,7 @@ const FEATURES: { title: string; line: string; soon?: boolean }[] = [
   { title: 'Tip history', line: 'Every tip you save, with monthly totals and CSV export for expense reports.' },
   { title: 'Saved presets', line: 'One tap for "my usual 20%" or "split with the team."' },
   { title: 'Split by item', line: 'Each person pays for what they ordered, with tax and tip divided fairly.' },
+  { title: 'Payment requests', line: 'Send each person their share with Venmo, Cash App or PayPal links, amount filled in.' },
   { title: 'Holiday tipping planner', line: 'Who to thank, what is typical, and a budget you can check off.' },
   { title: 'Receipt scan', line: 'Snap the check, tap who had what, and every share is worked out. Read on your phone, never uploaded.' },
 ];
