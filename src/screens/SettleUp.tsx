@@ -6,7 +6,7 @@ import { Icon } from '../components/icons';
 import { Text } from '../components/Text';
 import { Body, Btn, Label } from '../components/ui';
 import { font } from '../fonts';
-import { cleanHandle, hasHandles, PAY_APPS, requestMessage, type PayHandles, type RequestInput } from '../lib/pay';
+import { cleanHandle, hasHandles, openPayApp, PAY_APPS, requestMessage, type PayHandles, type RequestInput } from '../lib/pay';
 import { money } from '../lib/tip';
 import { useProGate, useStore } from '../store';
 import { mono, space, useColors } from '../theme';
@@ -34,32 +34,94 @@ function Sheet({ visible, onClose, title, children }: { visible: boolean; onClos
   );
 }
 
-/** Free: pick a pay app. The amount is copied so it can be pasted in that app. */
-export function PaySheet({ visible, amount, onClose }: { visible: boolean; amount: number; onClose: () => void }) {
+export type PayMode = 'full' | 'tip' | 'other';
+
+/**
+ * Free: pick a pay app. The chosen amount is copied so it can be pasted in that app.
+ * Full, tip only (paid the bill at the register, tipping the person separately), or any amount.
+ */
+export function PaySheet({ visible, full, tip, defaultMode, onClose }: { visible: boolean; full: number; tip: number; defaultMode: PayMode; onClose: () => void }) {
   const c = useColors();
   const { flash } = useStore();
+  const [mode, setMode] = useState<PayMode>(defaultMode);
+  const [other, setOther] = useState('');
+  const tipOnlyDiffers = tip > 0 && Math.abs(full - tip) > 0.004;
+  useEffect(() => {
+    if (visible) {
+      setMode(tipOnlyDiffers ? defaultMode : 'full');
+      setOther('');
+    }
+  }, [visible, defaultMode, tipOnlyDiffers]);
+
+  const amount = mode === 'tip' ? tip : mode === 'other' ? Math.max(0, parseFloat(other.replace(/[^0-9.]/g, '')) || 0) : full;
   const value = amount.toFixed(2);
-  const open = async (url: string, name: string) => {
+
+  const copy = async () => {
     try {
       await Clipboard.setStringAsync(value);
-      flash(`Copied ${money(amount)}. Paste it in ${name}.`);
+      return true;
     } catch {
-      // Copying is a convenience; open the app either way.
+      return false;
     }
-    onClose();
-    Linking.openURL(url).catch(() => flash(`Couldn't open ${name}`));
   };
+  const open = async (app: (typeof PAY_APPS)[number]) => {
+    const copied = amount > 0 && (await copy());
+    onClose();
+    const how = await openPayApp(app, (u) => Linking.openURL(u));
+    if (how === 'none') flash(`Couldn't open ${app.name}`);
+    else if (copied) flash(`Copied ${money(amount)}. Paste it in ${app.name}.`);
+  };
+
+  const choice = (m: PayMode, label: string, sub?: string) => (
+    <Pressable
+      key={m}
+      onPress={() => setMode(m)}
+      accessibilityRole="radio"
+      accessibilityState={{ selected: mode === m }}
+      style={[st.choice, { borderColor: mode === m ? c.selected : c.border, backgroundColor: mode === m ? c.selected : c.surface }]}
+    >
+      <Text style={{ color: mode === m ? c.onSelected : c.ink, fontWeight: '600', fontSize: 14 }}>{label}</Text>
+      {sub ? <Text style={{ color: mode === m ? c.onSelected : c.muted, fontFamily: mono, fontSize: 14 }}>{sub}</Text> : null}
+    </Pressable>
+  );
+
   return (
     <Sheet visible={visible} onClose={onClose} title="Pay">
-      <View style={[st.amount, { backgroundColor: c.result }]}>
-        <Text style={{ color: c.onResult, fontSize: 14, fontWeight: '600' }}>Amount</Text>
-        <Text style={{ color: c.onResult, fontFamily: mono, fontSize: 40, lineHeight: 46 }}>{money(amount)}</Text>
-      </View>
+      {tipOnlyDiffers && (
+        <View style={st.choices}>
+          {choice('full', 'Full', money(full))}
+          {choice('tip', 'Tip only', money(tip))}
+          {choice('other', 'Other')}
+        </View>
+      )}
+      {mode === 'other' ? (
+        <View style={[st.amount, { backgroundColor: c.result }]}>
+          <Text style={{ color: c.onResult, fontSize: 14, fontWeight: '600' }}>Amount</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={{ color: c.onResult, fontFamily: mono, fontSize: 40, lineHeight: 46 }}>$</Text>
+            <TextInput
+              autoFocus
+              value={other}
+              onChangeText={(t) => setOther(t.replace(/[^0-9.]/g, ''))}
+              keyboardType="decimal-pad"
+              placeholder="0.00"
+              placeholderTextColor="rgba(24,35,34,0.45)"
+              style={{ flex: 1, color: c.onResult, fontFamily: font('mono'), fontSize: 40, paddingVertical: 0, fontVariant: ['tabular-nums'] }}
+              accessibilityLabel="Amount to pay"
+            />
+          </View>
+        </View>
+      ) : (
+        <View style={[st.amount, { backgroundColor: c.result }]}>
+          <Text style={{ color: c.onResult, fontSize: 14, fontWeight: '600' }}>{mode === 'tip' ? 'Tip only' : 'Amount'}</Text>
+          <Text style={{ color: c.onResult, fontFamily: mono, fontSize: 40, lineHeight: 46 }}>{money(amount)}</Text>
+        </View>
+      )}
       <Body muted small>Pick an app. The amount is copied, so you can paste it in.</Body>
       {PAY_APPS.map((a) => (
         <Pressable
           key={a.id}
-          onPress={() => open(a.url, a.name)}
+          onPress={() => open(a)}
           accessibilityRole="button"
           accessibilityLabel={`Open ${a.name}`}
           style={({ pressed }) => [st.row, { borderColor: c.border, backgroundColor: c.surface }, pressed && { opacity: 0.75 }]}
@@ -70,8 +132,7 @@ export function PaySheet({ visible, amount, onClose }: { visible: boolean; amoun
       ))}
       <Pressable
         onPress={async () => {
-          await Clipboard.setStringAsync(value).catch(() => {});
-          flash(`Copied ${money(amount)}`);
+          if (await copy()) flash(`Copied ${money(amount)}`);
           onClose();
         }}
         accessibilityRole="button"
@@ -175,5 +236,7 @@ const st = StyleSheet.create({
   close: { minHeight: space.target, justifyContent: 'center', paddingLeft: 12 },
   amount: { borderRadius: space.cardRadius, padding: 16, gap: 2 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1.5, borderRadius: space.controlRadius, minHeight: 56, paddingHorizontal: 16 },
+  choices: { flexDirection: 'row', gap: 8 },
+  choice: { flex: 1, borderWidth: 1.5, borderRadius: space.controlRadius, minHeight: 56, alignItems: 'center', justifyContent: 'center', paddingVertical: 8, gap: 2 },
   input: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: space.controlRadius, paddingHorizontal: 12, minHeight: space.target },
 });

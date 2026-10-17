@@ -13,7 +13,7 @@ import { applyPreset, blankPeople, initialCalc, newId, presetFrom, withService, 
 import { useProGate, useStore } from '../store';
 import { mono, space, useColors } from '../theme';
 import { canScanReceipts, ReceiptScreen } from './ReceiptScreen';
-import { HandlesSheet, PaySheet, useRequest } from './SettleUp';
+import { HandlesSheet, PaySheet, useRequest, type PayMode } from './SettleUp';
 import { hasHandles } from '../lib/pay';
 
 /** Default tip cards when no service is picked (Modern Mint: three cards, then Custom tip / No tip). */
@@ -104,6 +104,12 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
 
   // What "Pay" uses: your share when the bill is split evenly, otherwise the whole amount.
   const payAmount = flat ? (state.split > 1 ? flatResult.each : flatResult.tip) : itemized ? itemResult.total : state.split > 1 ? pctResult.each : pctResult.total;
+  // Tip only: for paying the bill at the register and tipping the person separately.
+  const share = (v: number) => (state.split > 1 && !itemized ? Math.ceil((v / state.split) * 100 - 1e-9) / 100 : v);
+  const payTip = flat ? payAmount : share(itemized ? itemResult.tip : pctResult.tip);
+  // Restaurants and bars usually take the tip with the bill; most other services get tipped
+  // separately (salon, valet, towing, delivery), so start on "Tip only" for those.
+  const payDefault: PayMode = svc && svc.category !== 'Food & drink' ? 'tip' : 'full';
   const forLabel = svc?.name ?? 'the bill';
 
   // Anything the person entered that "Start over" would clear.
@@ -279,7 +285,7 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
       {/* Settle up: Pay is free; requests are Pro. */}
       {payAmount > 0 && (
         <View style={st.two}>
-          <View style={{ flex: 1 }}><Btn title={`Pay ${money(payAmount)}`} onPress={() => setPaying(true)} /></View>
+          <View style={{ flex: 1 }}><Btn title={flat ? `Pay ${money(payAmount)}` : 'Pay or send the tip'} onPress={() => setPaying(true)} /></View>
         </View>
       )}
 
@@ -425,7 +431,7 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
 
       {!svc && <Text style={{ color: c.muted, fontSize: 14, textAlign: 'center' }}>Not sure what to tip? Type what it's for in the search box above.</Text>}
 
-      <PaySheet visible={paying} amount={payAmount} onClose={() => setPaying(false)} />
+      <PaySheet visible={paying} full={payAmount} tip={payTip} defaultMode={payDefault} onClose={() => setPaying(false)} />
       <HandlesSheet visible={editingHandles} onClose={() => setEditingHandles(false)} />
       {requestSheet}
 

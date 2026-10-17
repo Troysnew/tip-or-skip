@@ -21,12 +21,38 @@ export const emptyHandles: PayHandles = { venmo: '', cashtag: '', paypal: '' };
 
 export type PayApp = 'venmo' | 'cashapp' | 'paypal';
 
-/** Where the free Pay button sends people. Each opens the app if installed, the site if not. */
-export const PAY_APPS: { id: PayApp; name: string; url: string }[] = [
-  { id: 'venmo', name: 'Venmo', url: 'https://venmo.com/' },
-  { id: 'cashapp', name: 'Cash App', url: 'https://cash.app/' },
-  { id: 'paypal', name: 'PayPal', url: 'https://www.paypal.com/myaccount/transfer/homepage' },
+/**
+ * Where the free Pay button sends people. The app's own link schemes are tried first so the app
+ * opens directly; the website is the fallback when none of them can be opened (app not installed).
+ * Schemes: PayPal publishes paypal://; cashme:// and squarecash:// (Cash App) and venmo:// are the
+ * commonly used ones but are not documented by those companies.
+ */
+export const PAY_APPS: { id: PayApp; name: string; schemes: string[]; url: string }[] = [
+  { id: 'venmo', name: 'Venmo', schemes: ['venmo://'], url: 'https://venmo.com/' },
+  { id: 'cashapp', name: 'Cash App', schemes: ['cashme://', 'squarecash://'], url: 'https://cash.app/' },
+  { id: 'paypal', name: 'PayPal', schemes: ['paypal://'], url: 'https://www.paypal.com/myaccount/transfer/homepage' },
 ];
+
+/**
+ * Opens a pay app: each scheme in turn, then the website. `open` is Linking.openURL, which
+ * rejects when nothing on the phone can open the link. Returns which one opened.
+ */
+export async function openPayApp(app: { schemes: string[]; url: string }, open: (url: string) => Promise<unknown>): Promise<'app' | 'web' | 'none'> {
+  for (const s of app.schemes) {
+    try {
+      await open(s);
+      return 'app';
+    } catch {
+      // Not installed, or this scheme isn't the right one: try the next.
+    }
+  }
+  try {
+    await open(app.url);
+    return 'web';
+  } catch {
+    return 'none';
+  }
+}
 
 /** Accepts "@name", "$name", "name", or a pasted profile link, and returns the bare name. */
 export function cleanHandle(app: keyof PayHandles, raw: string): string {
