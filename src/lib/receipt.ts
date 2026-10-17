@@ -89,7 +89,11 @@ function readAmount(raw: string): number | null {
 }
 
 function splitAmount(text: string): { name: string; amount: number | null } {
-  const fixed = text.replace(/(\d)\s*[oO]\s*$/, '$10').replace(/[oO](\d)$/, '0$1');
+  const fixed = text
+    .replace(/(\d)\s*[oO]\s*$/, '$10')
+    .replace(/[oO](\d)$/, '0$1')
+    // "$O.15": a letter O for the leading zero.
+    .replace(/[oO](?=[.,]\d{2}\s*(?:[A-Z]{1,2}|\*)?\s*$)/, '0');
   const m = fixed.match(AMOUNT_AT_END);
   if (!m || m.index === undefined) return { name: text.trim(), amount: null };
   const amount = readAmount(m[1]);
@@ -310,80 +314,96 @@ export function parseReceipt(input: OcrLine[]): ParsedReceipt {
   const { rows, unit } = buildRows(input);
   const kinds = rows.map((r) => kindOf(r.amount === null ? r.text : r.name, r.amount));
 
+  const firstOf = (ks: Kind[]) => rows.findIndex((r, k) => r.amount !== null && ks.includes(kinds[k]));
   // Items stop at the first subtotal, tax, service charge or total that carries an amount.
-  let end = rows.findIndex((r, k) => r.amount !== null && ['subtotal', 'total', 'tax', 'service'].includes(kinds[k]));
-  if (end < 0) end = rows.length;
+  const stop = firstOf(['subtotal', 'total', 'tax', 'service']);
+  const subRow = firstOf(['subtotal']);
 
-  // Where item names usually start, to tell indented add-ons from items.
-  const priced = rows.slice(0, end).filter((r, k) => r.amount !== null && kinds[k] === 'item');
-  const itemLeft = median(priced.map((r) => r.left));
-
-  const items: ReceiptItem[] = [];
-  let discount = 0;
-  for (let k = 0; k < end; k++) {
-    const r = rows[k];
-    if (r.amount === null) continue;
-    const kind = kinds[k];
-    if (kind === 'discount') {
-      const v = -Math.abs(r.amount);
-      discount += -v;
-      const label = cleanName(r.name).name;
-      // A coupon printed right under its item ("ECPN-PICK N'" under "PICK N' PACK") comes off
-      // that item instead of showing as a separate line.
-      const last = items[items.length - 1];
-      if (last && last.price > 0 && couponFor(label, last.name)) {
-        last.price = round2(last.price + v);
+  const collect = (endAt: number, fees: boolean) => {
+    let end = endAt < 0 ? rows.length : endAt;
+    // Where item names usually start, to tell indented add-ons from items.
+    const priced = rows.slice(0, end).filter((r, k) => r.amount !== null && kinds[k] === 'item');
+    const itemLeft = median(priced.map((r) => r.left));
+    const items: ReceiptItem[] = [];
+    let discount = 0;
+    for (let k = 0; k < end; k++) {
+      const r = rows[k];
+      if (r.amount === null) continue;
+      const kind = kinds[k];
+      if (kind === 'discount') {
+        const v = -Math.abs(r.amount);
+        discount += -v;
+        const label = cleanName(r.name).name;
+        // A coupon printed right under its item ("ECPN-PICK N'" under "PICK N' PACK") comes off
+        // that item instead of showing as a separate line.
+        const last = items[items.length - 1];
+        if (last && last.price > 0 && couponFor(label, last.name)) {
+          last.price = round2(last.price + v);
+          continue;
+        }
+        items.push({ name: label || 'Discount', qty: 1, price: v });
         continue;
       }
-      items.push({ name: label || 'Discount', qty: 1, price: v });
-      continue;
-    }
-    if (kind !== 'item') continue;
-    // An unlabeled or oddly labeled subtotal: the amount equals everything above it and the
-    // next priced row is tax, a service charge or the total.
-    const running = items.reduce((a, i) => a + i.price, 0);
-    if (items.length >= 2 && Math.abs(r.amount - running) <= 0.02) {
-      const next = rows.slice(k + 1).findIndex((x) => x.amount !== null);
-      const nk = next < 0 ? -1 : k + 1 + next;
-      if (nk >= 0 && ['tax', 'service', 'total', 'subtotal'].includes(kinds[nk])) {
-        kinds[k] = 'subtotal';
-        end = k;
-        break;
+      // Fees printed above the subtotal ("CHICAGO BAG TAX 0.05") are part of it.
+      if (kind !== 'item' && !(fees && (kind === 'tax' || kind === 'service'))) continue;
+      // An unlabeled or oddly labeled subtotal: the amount equals everything above it and the
+      // next priced row is tax, a service charge or the total.
+      const running = items.reduce((a, i) => a + i.price, 0);
+      if (items.length >= 2 && Math.abs(r.amount - running) <= 0.02) {
+        const next = rows.slice(k + 1).findIndex((x) => x.amount !== null);
+        const nk = next < 0 ? -1 : k + 1 + next;
+        if (nk >= 0 && ['tax', 'service', 'total', 'subtotal'].includes(kinds[nk])) {
+          kinds[k] = 'subtotal';
+          end = k;
+          break;
+        }
       }
-    }
 
-    let { name, qty } = cleanName(r.name);
-    const prevRow = rows[k - 1];
-    const prevUnpriced = prevRow && prevRow.amount === null && kinds[k - 1] === 'item' ? prevRow : null;
+      let { name, qty } = cleanName(r.name);
+      const prevRow = rows[k - 1];
+      const prevUnpriced = prevRow && prevRow.amount === null && kinds[k - 1] === 'item' ? prevRow : null;
 
-    // "Burger" on one row, "2 @ 12.99   25.98" on the next.
-    const at = r.name.replace(/\s+/g, ' ').trim().match(AT_LINE);
-    if (at && prevUnpriced) {
-      items.push({ name: cleanName(prevUnpriced.text).name, qty: parseInt(at[1], 10), price: r.amount });
-      continue;
-    }
-    // A price with no name: the name wrapped onto the row above.
-    if (!/[a-z]{2}/i.test(name) && prevUnpriced) {
-      const c = cleanName(prevUnpriced.text);
-      items.push({ name: c.name, qty: c.qty, price: r.amount });
-      continue;
-    }
-    if (!/[a-z]/i.test(name)) continue;
+      // "Burger" on one row, "2 @ 12.99   25.98" on the next.
+      const at = r.name.replace(/\s+/g, ' ').trim().match(AT_LINE);
+      if (at && prevUnpriced) {
+        items.push({ name: cleanName(prevUnpriced.text).name, qty: parseInt(at[1], 10), price: r.amount });
+        continue;
+      }
+      // A price with no name: the name wrapped onto the row above.
+      if (!/[a-z]{2}/i.test(name) && prevUnpriced) {
+        const c = cleanName(prevUnpriced.text);
+        items.push({ name: c.name, qty: c.qty, price: r.amount });
+        continue;
+      }
+      if (!/[a-z]/i.test(name)) continue;
 
-    // Priced add-ons: "+ Bacon 2.00", "Add bacon 2.00", or indented under the item.
-    const addOn = /^\s*[+>]|^add\b|^extra\b|^sub\b/i.test(r.name) || (items.length > 0 && r.left > itemLeft + 1.5 * unit);
-    if (addOn && items.length && items[items.length - 1].price > 0) {
-      const last = items[items.length - 1];
-      last.price = round2(last.price + r.amount);
-      continue;
+      // Priced add-ons: "+ Bacon 2.00", "Add bacon 2.00", or indented under the item.
+      const addOn = /^\s*[+>]|^add\b|^extra\b|^sub\b/i.test(r.name) || (items.length > 0 && r.left > itemLeft + 1.5 * unit);
+      if (addOn && items.length && items[items.length - 1].price > 0) {
+        const last = items[items.length - 1];
+        last.price = round2(last.price + r.amount);
+        continue;
+      }
+      items.push({ name, qty, price: r.amount });
     }
-    items.push({ name, qty, price: r.amount });
+    return { items, discount, end };
+  };
+
+  // Usually items end at the first tax or total line. But some stores print fees labeled as
+  // tax among the items and include them in the subtotal; then the items run to the subtotal.
+  let picked = collect(stop, false);
+  if (subRow > stop && stop >= 0) {
+    const subAmt = rows[subRow].amount!;
+    const sum = (x: { items: ReceiptItem[] }) => x.items.reduce((a, i) => a + i.price, 0);
+    const withFees = collect(subRow, true);
+    if (Math.abs(sum(withFees) - subAmt) <= 0.02 && Math.abs(sum(picked) - subAmt) > 0.02) picked = withFees;
   }
+  const { items, discount, end } = picked;
 
   const after = rows.map((r, k) => ({ r, kind: kinds[k] })).slice(end).filter((x) => x.r.amount !== null);
   const first = (kind: Kind) => after.find((x) => x.kind === kind)?.r.amount ?? null;
   // The first total after the items. Later "Total" rows are usually payment copies or tip lines.
-  const tax = sumOf(after.filter((x) => x.kind === 'tax').map((x) => x.r.amount!), 'tax');
+  let tax = sumOf(after.filter((x) => x.kind === 'tax').map((x) => x.r.amount!), 'tax');
   let subtotal = first('subtotal');
   const serviceCharge = first('service');
   let total = first('total');
@@ -398,7 +418,28 @@ export function parseReceipt(input: OcrLine[]): ParsedReceipt {
     const bare = after.find((x) => Math.abs(x.r.amount! - expected) <= 0.02 && !/[a-z]{2}/i.test(x.r.name));
     if (bare) total = bare.r.amount;
   }
-  const itemsSum = round2(items.reduce((a, i) => a + i.price, 0));
+  // With both a printed subtotal and total, tax is whatever sits between them (less any
+  // service charge). This covers unlabeled lines ("HT", "PPF"), several tax lines, and a
+  // misread like "$1.52" read as "51.52".
+  if (subtotal !== null && total !== null) {
+    const gap = round2(total - subtotal - (serviceCharge ?? 0));
+    if (gap >= 0 && (tax === null || Math.abs(tax - gap) > 0.05)) tax = gap > 0 ? gap : null;
+  }
+  let itemsSum = round2(items.reduce((a, i) => a + i.price, 0));
+  // "$7.95" read as "57.95": if dropping a leading 5 from one price makes the items match the
+  // subtotal, that was the dollar sign.
+  if (subtotal !== null && Math.abs(itemsSum - subtotal) > 0.02) {
+    for (const it of items) {
+      const t = it.price.toFixed(2);
+      if (!/^5\d+\.\d\d$/.test(t)) continue;
+      const alt = parseFloat(t.slice(1));
+      if (Math.abs(itemsSum - it.price + alt - subtotal) <= 0.02) {
+        it.price = alt;
+        itemsSum = round2(items.reduce((a, i) => a + i.price, 0));
+        break;
+      }
+    }
+  }
   if (subtotal === null && total !== null) subtotal = round2(total - (tax ?? 0) - (serviceCharge ?? 0));
   const near = (v: number | null) => v !== null && Math.abs(itemsSum - v) <= 0.02;
   const taxIncluded = !near(subtotal) && !!tax && near(total === null ? null : total - (serviceCharge ?? 0));
