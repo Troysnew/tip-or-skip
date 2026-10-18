@@ -22,6 +22,8 @@ export interface CalcState {
   shared: string;
   qty: number;
   flatAmount: string;
+  /** Bad weather (rain, snow, extreme heat): raise the suggestions for outdoor services. */
+  weather?: boolean;
 }
 
 export const newId = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
@@ -52,8 +54,8 @@ export type Polls = Record<string, string>;
 /** Load a service's recommended tip into the calculator. */
 export function withService(state: CalcState, s: Service): CalcState {
   const def = defaultOption(s);
-  if (s.flat) return { ...state, serviceId: s.id, flatAmount: String(def), qty: 1, splitMode: 'even' };
-  return { ...state, serviceId: s.id, pct: def };
+  if (s.flat) return { ...state, serviceId: s.id, flatAmount: String(def), qty: 1, splitMode: 'even', weather: false };
+  return { ...state, serviceId: s.id, pct: def, weather: false };
 }
 
 /* ---------- Pro data ---------- */

@@ -25,6 +25,12 @@ export interface Service {
   bankrate?: BankrateKey;
   /** Show the Pew restaurant tip-amount distribution. */
   amountStats?: boolean;
+  /**
+   * Extra to suggest in bad weather (rain, snow, extreme heat), in the service's own units:
+   * percentage points for pct services, dollars per unit for flat ones. Our suggestion: guides
+   * say to add more in bad weather but don't give a number.
+   */
+  weatherBump?: number;
   note: string;
 }
 
@@ -63,23 +69,23 @@ export const SERVICES: Service[] = [
     { id: 'sommelier', name: 'Sommelier', aliases: ['wine', 'wine steward'], verdict: 'optional', pct: [10, 15, 10], source: COMMON, note: 'Applies to the wine portion. Only when a sommelier actively helped choose.' },
   ]),
   ...cat('Delivery', [
-    { id: 'delivery', name: 'Food delivery app', aliases: ['doordash', 'uber eats', 'grubhub', 'delivery driver', 'delivery'], verdict: 'expected', pct: [10, 15, 15], source: EPI, pew: 'delivery', bankrate: 'delivery', sourceUrl: EPI_URL, note: 'Emily Post says 10% to 15% of the bill. Add more for bad weather, long distances, or big orders.' },
-    { id: 'pizza', name: 'Pizza delivery', aliases: ['dominos', 'papa johns', 'pizza'], verdict: 'expected', flat: [2, 5, 3], unit: 'per delivery', qtyLabel: 'Deliveries', source: EPI, sourceUrl: EPI_URL, note: 'Emily Post says $2 to $5, depending on the size of the order and how hard the delivery is. A "delivery fee" usually goes to the store, not the driver.' },
-    { id: 'grocery', name: 'Grocery delivery', aliases: ['instacart', 'shipt', 'walmart delivery', 'groceries'], verdict: 'expected', pct: [10, 15, 10], source: COMMON, note: 'Shoppers pick and carry everything, so tip like food delivery.' },
+    { id: 'delivery', weatherBump: 5, name: 'Food delivery app', aliases: ['doordash', 'uber eats', 'grubhub', 'delivery driver', 'delivery'], verdict: 'expected', pct: [10, 15, 15], source: EPI, pew: 'delivery', bankrate: 'delivery', sourceUrl: EPI_URL, note: 'Emily Post says 10% to 15% of the bill. Add more for bad weather, long distances, or big orders.' },
+    { id: 'pizza', weatherBump: 2, name: 'Pizza delivery', aliases: ['dominos', 'papa johns', 'pizza'], verdict: 'expected', flat: [2, 5, 3], unit: 'per delivery', qtyLabel: 'Deliveries', source: EPI, sourceUrl: EPI_URL, note: 'Emily Post says $2 to $5, depending on the size of the order and how hard the delivery is. A "delivery fee" usually goes to the store, not the driver.' },
+    { id: 'grocery', weatherBump: 5, name: 'Grocery delivery', aliases: ['instacart', 'shipt', 'walmart delivery', 'groceries'], verdict: 'expected', pct: [10, 15, 10], source: COMMON, note: 'Shoppers pick and carry everything, so tip like food delivery.' },
     { id: 'mail', name: 'Mail carrier (USPS)', aliases: ['mailman', 'postal', 'usps', 'postman'], verdict: 'not', pct: [0, 0, 0], source: 'Emily Post Institute (USPS rules)', sourceUrl: EPI_HOLIDAY_URL, note: 'Carriers cannot accept cash, checks, or gift cards. A small holiday gift worth $20 or less, or snacks and drinks, is allowed.' },
     { id: 'package', name: 'UPS / FedEx / Amazon driver', aliases: ['ups', 'fedex', 'amazon', 'package', 'parcel'], verdict: 'not', pct: [0, 0, 0], source: EPI, sourceUrl: EPI_HOLIDAY_URL, note: 'Not expected per delivery. Emily Post suggests a holiday gift around $20, only if you get regular deliveries, and no cash.' },
-    { id: 'furniture', name: 'Furniture / appliance delivery', aliases: ['appliance', 'couch delivery', 'mattress'], verdict: 'optional', flat: [10, 20, 10], unit: 'per person', qtyLabel: 'Crew members', source: EPI, sourceUrl: EPI_FINER_URL, note: 'Customs vary by store. Emily Post suggests calling the store to ask whether tipping is customary. A tip is most common when they carry heavy items up stairs or install something.' },
-    { id: 'movers', name: 'Movers', aliases: ['moving company', 'moving crew', 'two men and a truck'], verdict: 'expected', flat: [4, 8, 5], unit: 'per mover, per hour', qtyLabel: 'Mover-hours', source: COMMON, note: 'Hand it to each mover directly, or to the crew lead if they will split it. Cold water and snacks are appreciated too.' },
+    { id: 'furniture', weatherBump: 5, name: 'Furniture / appliance delivery', aliases: ['appliance', 'couch delivery', 'mattress'], verdict: 'optional', flat: [10, 20, 10], unit: 'per person', qtyLabel: 'Crew members', source: EPI, sourceUrl: EPI_FINER_URL, note: 'Customs vary by store. Emily Post suggests calling the store to ask whether tipping is customary. A tip is most common when they carry heavy items up stairs or install something.' },
+    { id: 'movers', weatherBump: 2, name: 'Movers', aliases: ['moving company', 'moving crew', 'two men and a truck'], verdict: 'expected', flat: [4, 8, 5], unit: 'per mover, per hour', qtyLabel: 'Mover-hours', source: COMMON, note: 'Hand it to each mover directly, or to the crew lead if they will split it. Cold water and snacks are appreciated too.' },
   ]),
   ...cat('Travel', [
     { id: 'housekeeping', name: 'Hotel housekeeping', aliases: ['maid', 'hotel maid', 'room cleaning', 'hotel'], verdict: 'expected', flat: [2, 5, 5], unit: 'per night', qtyLabel: 'Nights', source: EPI, bankrate: 'housekeeping', sourceUrl: EPI_URL, note: 'Leave it daily with a note marked for housekeeping, since staff can change during your stay. No tip for days you skip service.' },
     { id: 'bellhop', name: 'Bellhop / doorman', aliases: ['bellman', 'porter', 'luggage', 'bags', 'doorman'], verdict: 'expected', flat: [1, 4, 2], unit: 'per bag', qtyLabel: 'Bags', source: EPI, sourceUrl: EPI_URL, note: 'Bellhop: $2 for the first bag and $1 for each one after. Doorman: $1 to $4 for carrying luggage.' },
-    { id: 'valet', name: 'Valet parking', aliases: ['valet', 'parking attendant'], verdict: 'expected', flat: [2, 5, 3], unit: 'per retrieval', qtyLabel: 'Retrievals', source: EPI, sourceUrl: EPI_URL, note: 'Tip when the car comes back to you.' },
+    { id: 'valet', weatherBump: 2, name: 'Valet parking', aliases: ['valet', 'parking attendant'], verdict: 'expected', flat: [2, 5, 3], unit: 'per retrieval', qtyLabel: 'Retrievals', source: EPI, sourceUrl: EPI_URL, note: 'Tip when the car comes back to you.' },
     { id: 'concierge', name: 'Hotel concierge', aliases: ['concierge', 'reservations'], verdict: 'optional', flat: [5, 10, 5], unit: 'per request', qtyLabel: 'Requests', source: EPI, sourceUrl: EPI_URL, note: 'No tip for directions or questions. Tip when they book a table or land tickets.' },
     { id: 'roomservice', name: 'Room service', aliases: ['in room dining'], verdict: 'expected', pct: [15, 20, 15], source: AHLA, note: 'Check the slip first. Many hotels already add a gratuity.' },
     { id: 'taxi', name: 'Taxi', aliases: ['cab', 'cabbie', 'taxi driver'], verdict: 'expected', pct: [15, 20, 15], source: EPI, pew: 'rideshare', sourceUrl: EPI_URL, note: 'Emily Post sets a $1 minimum, plus $2 for the first bag and $1 for each additional bag the driver handles.' },
     { id: 'rideshare', name: 'Uber / Lyft driver', aliases: ['uber', 'lyft', 'rideshare', 'ride share'], verdict: 'expected', pct: [15, 20, 15], source: 'Emily Post Institute (taxi guidance)', pew: 'rideshare', sourceUrl: EPI_URL, note: 'Emily Post gives this range for taxis, and rideshare is usually tipped the same way. You can tip in the app after the ride.' },
-    { id: 'skycap', name: 'Airport skycap', aliases: ['curbside check in', 'airport porter'], verdict: 'expected', flat: [1, 2, 2], unit: 'per bag', qtyLabel: 'Bags', source: EPI, sourceUrl: EPI_URL, note: 'Emily Post says $2 for the first bag and $1 for each one after. Separate from any bag fee the airline charges.' },
+    { id: 'skycap', weatherBump: 1, name: 'Airport skycap', aliases: ['curbside check in', 'airport porter'], verdict: 'expected', flat: [1, 2, 2], unit: 'per bag', qtyLabel: 'Bags', source: EPI, sourceUrl: EPI_URL, note: 'Emily Post says $2 for the first bag and $1 for each one after. Separate from any bag fee the airline charges.' },
     { id: 'shuttle', name: 'Hotel / airport shuttle driver', aliases: ['shuttle'], verdict: 'optional', flat: [1, 2, 2], unit: 'per bag', qtyLabel: 'Bags', source: COMMON, note: 'When they load and unload your luggage.' },
     { id: 'tourguide', name: 'Tour guide', aliases: ['walking tour', 'guide', 'excursion'], verdict: 'expected', pct: [10, 20, 15], source: COMMON, note: 'For free walking tours the tip is the price. $10 to $20 per person is common.' },
     { id: 'cruise', name: 'Cruise staff', aliases: ['cruise', 'cruise ship'], verdict: 'included', pct: [0, 0, 0], source: COMMON, note: 'Most lines add a daily gratuity to your account. Extra cash for standout service is optional.' },
@@ -88,7 +94,7 @@ export const SERVICES: Service[] = [
     { id: 'flight', name: 'Flight attendant', aliases: ['airline', 'plane'], verdict: 'not', pct: [0, 0, 0], source: COMMON, note: 'Not expected, and some airlines do not allow it.' },
     { id: 'gas', name: 'Full-service gas attendant', aliases: ['gas station', 'pump'], verdict: 'not', pct: [0, 0, 0], source: COMMON, note: 'Not expected for pumping gas. A few dollars if they clean windows or check fluids.' },
     { id: 'carwash', name: 'Car wash (attended)', aliases: ['detailing', 'auto detail', 'hand wash'], verdict: 'expected', flat: [3, 5, 3], unit: 'per car', qtyLabel: 'Cars', source: COMMON, note: 'For full-service washes where people dry and wipe down the car. 10% to 20% for detailing.' },
-    { id: 'tow', name: 'Tow truck driver', aliases: ['roadside assistance', 'towing'], verdict: 'optional', flat: [5, 20, 10], unit: 'per tow', qtyLabel: 'Tows', source: COMMON, note: 'Optional. More in bad weather or a tricky recovery.' },
+    { id: 'tow', weatherBump: 5, name: 'Tow truck driver', aliases: ['roadside assistance', 'towing'], verdict: 'optional', flat: [5, 20, 10], unit: 'per tow', qtyLabel: 'Tows', source: COMMON, note: 'Optional. More in bad weather or a tricky recovery.' },
   ]),
   ...cat('Personal care', [
     { id: 'haircut', name: 'Barber / haircut', aliases: ['barber', 'haircut', 'fade', 'trim'], verdict: 'expected', pct: [15, 20, 20], source: EPI, pew: 'haircut', bankrate: 'haircut', sourceUrl: EPI_URL, note: 'Tip even if the barber owns the shop. That old rule has mostly faded.' },

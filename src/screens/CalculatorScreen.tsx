@@ -47,7 +47,10 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
   const tax = parseAmount(state.tax);
   const usesServiceRange = !!(svc?.pct && svc.pct[1] > 0);
   // "No tip" has its own button, so 0 never takes a card.
-  const pctValues = (usesServiceRange ? tipOptions(svc!) : DEFAULT_PCTS).filter((v) => v > 0);
+  // Bad weather raises every suggestion for outdoor services by the service's bump.
+  const canWeather = !!svc?.weatherBump && svc.verdict !== 'not';
+  const bump = canWeather && state.weather ? svc!.weatherBump! : 0;
+  const pctValues = (usesServiceRange ? tipOptions(svc!).map((v) => (v > 0 ? v + bump : v)) : DEFAULT_PCTS).filter((v) => v > 0);
 
   const pctResult = computePct({ bill, tax, base: state.base, pct: state.pct, round: state.round, split: state.split });
   const flatResult = computeFlat(parseAmount(state.flatAmount), state.qty, state.round, state.split);
@@ -60,12 +63,12 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
     value: v,
     top: `${v}%`,
     amount: money((pctResult.baseAmt * v) / 100),
-    recommended: !!(svc?.pct && v === svc.pct[2]),
+    recommended: !!(svc?.pct && v === svc.pct[2] + bump),
   }));
 
-  const flatValues = svc?.flat ? tipOptions(svc).filter((v) => v > 0) : [];
+  const flatValues = svc?.flat ? tipOptions(svc).filter((v) => v > 0).map((v) => v + bump) : [];
   const flatOptions: TipOption[] = svc?.flat
-    ? flatValues.map((v) => ({ value: v, top: `$${v}`, amount: `${money(v * state.qty)} total`, recommended: v === svc.flat![2] }))
+    ? flatValues.map((v) => ({ value: v, top: `$${v}`, amount: `${money(v * state.qty)} total`, recommended: v === svc.flat![2] + bump }))
     : [];
   const flatAmt = parseAmount(state.flatAmount);
 
@@ -229,6 +232,34 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
             <View style={{ flex: 1 }}><Btn small ghost title="Clear" onPress={() => { patch({ serviceId: null }); setCustomOpen(false); }} /></View>
           </View>
         </Card>
+      )}
+
+      {canWeather && (
+        <View style={{ gap: 6 }}>
+          <View style={{ flexDirection: 'row' }}>
+            <Chip
+              label={state.weather ? 'Bad weather: on' : 'Bad weather?'}
+              active={!!state.weather}
+              onPress={() =>
+                setState((s) => {
+                  const on = !s.weather;
+                  const b = svc!.weatherBump! * (on ? 1 : -1);
+                  // Move the chosen tip with the suggestions, unless it was No tip.
+                  if (svc!.flat) {
+                    const cur = parseAmount(s.flatAmount);
+                    return { ...s, weather: on, flatAmount: cur > 0 ? String(Math.max(0, cur + b)) : s.flatAmount };
+                  }
+                  return { ...s, weather: on, pct: s.pct > 0 ? Math.max(0, s.pct + b) : s.pct };
+                })
+              }
+            />
+          </View>
+          <Text style={{ color: c.muted, fontSize: 13, lineHeight: 18 }}>
+            {state.weather
+              ? `Rain, snow or extreme heat: suggestions are ${svc!.flat ? `$${svc!.weatherBump} more ${svc!.unit}` : `${svc!.weatherBump}% higher`}. That's our suggestion. Guides say to add more in bad weather but don't give a number.`
+              : 'Rain, snow or extreme heat? Tap to raise the suggestions.'}
+          </Text>
+        </View>
       )}
 
       {/* Amount and tip choice */}
