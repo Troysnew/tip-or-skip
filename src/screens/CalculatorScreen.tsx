@@ -238,7 +238,7 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
         <View style={{ gap: 6 }}>
           <View style={{ flexDirection: 'row' }}>
             <Chip
-              label={state.weather ? 'Bad weather: on' : 'Bad weather?'}
+              label="Bad weather"
               active={!!state.weather}
               onPress={() =>
                 setState((s) => {
@@ -256,8 +256,8 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
           </View>
           <Text style={{ color: c.muted, fontSize: 13, lineHeight: 18 }}>
             {state.weather
-              ? `Rain, snow or extreme heat: suggestions are ${svc!.flat ? `$${svc!.weatherBump} more ${svc!.unit}` : `${svc!.weatherBump}% higher`}. That's our suggestion. Guides say to add more in bad weather but don't give a number.`
-              : 'Rain, snow or extreme heat? Tap to raise the suggestions.'}
+              ? `Showing bad-weather suggestions: ${svc!.flat ? `$${svc!.weatherBump} more ${svc!.unit}` : `${svc!.weatherBump}% more than usual`}. Guides say to tip more but don't set an amount, so this is our suggestion.`
+              : 'Rain, snow, or extreme heat? Tap for bad-weather suggestions.'}
           </Text>
         </View>
       )}
