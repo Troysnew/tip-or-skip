@@ -42,7 +42,7 @@ export function DataScreen() {
           </>
         )}
       </Card>
-      <Text style={{ color: c.muted, fontSize: 12 }}>Version 0.7.2</Text>
+      <Text style={{ color: c.muted, fontSize: 12 }}>Version 0.7.3</Text>
       <View style={{ gap: 4 }}>
         <H2>Where the numbers come from</H2>
         <Body muted>Stats appear only where a published survey measured that service. Everything else waits for in-app responses.</Body>

@@ -3,7 +3,7 @@ import { Alert, Linking, Pressable, StyleSheet, TextInput, View } from 'react-na
 import { font } from '../fonts';
 import { Text } from '../components/Text';
 import { Body, Btn, Card, Checkbox, Chip, EmptyState, H2, H3, ProTag } from '../components/ui';
-import { HOLIDAY_SOURCE_URL, HOLIDAY_TEMPLATES } from '../data/holiday';
+import { HOLIDAY_SOURCE_URL, HOLIDAY_TEMPLATES, holidaySuggestions, type HolidayTemplate } from '../data/holiday';
 import { money, parseAmount } from '../lib/tip';
 import { newId, type HolidayItem } from '../state';
 import { useStore } from '../store';
@@ -28,7 +28,11 @@ export function HolidayScreen() {
 
   const items = holiday.items;
   const update = (id: string, p: Partial<HolidayItem>) => setHoliday((h) => ({ ...h, items: h.items.map((x) => (x.id === id ? { ...x, ...p } : x)) }));
-  const add = (who: string, templateId?: string) => setHoliday((h) => ({ ...h, items: [...h.items, { id: newId(), who, templateId, amount: '', given: false }] }));
+  // Adding someone from the guide prefills a recommended amount when the guide gives one.
+  const add = (who: string, t?: HolidayTemplate) => {
+    const pre = t ? holidaySuggestions(t.rec).prefill : null;
+    setHoliday((h) => ({ ...h, items: [...h.items, { id: newId(), who, templateId: t?.id, amount: pre ? String(pre) : '', given: false, count: 1 }] }));
+  };
   const remove = (it: HolidayItem) =>
     Alert.alert('Remove from your list?', it.who, [
       { text: 'Cancel', style: 'cancel' },
@@ -67,38 +71,31 @@ export function HolidayScreen() {
       )}
       {items.length > 0 && (
         <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
-          {items.map((it, i) => {
-            const t = HOLIDAY_TEMPLATES.find((x) => x.id === it.templateId);
-            return (
-              <Pressable key={it.id} onLongPress={() => remove(it)} style={[st.row, i < items.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.line }]}>
-                <Checkbox checked={it.given} onToggle={() => update(it.id, { given: !it.given })} label={`Given to ${it.who}`} />
-                <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-                  <Text style={{ color: c.ink, fontWeight: '600', textDecorationLine: it.given ? 'line-through' : 'none' }}>{it.who}</Text>
-                  {t && <Text style={{ color: c.muted, fontSize: 12 }}>{t.guide}</Text>}
-                </View>
-                <View style={[st.amount, { borderColor: c.line, backgroundColor: c.bg }]}>
-                  <Text style={{ color: c.muted, fontFamily: mono }}>$</Text>
-                  <TextInput
-                    value={it.amount}
-                    onChangeText={(v) => update(it.id, { amount: v.replace(/[^0-9.]/g, '') })}
-                    keyboardType="decimal-pad"
-                    placeholder="0"
-                    placeholderTextColor={c.muted}
-                    style={{ flex: 1, color: c.ink, fontFamily: font('mono', 700), fontSize: 15, paddingVertical: 6, paddingHorizontal: 4 }}
-                    accessibilityLabel={`Amount for ${it.who}`}
-                  />
-                </View>
-              </Pressable>
-            );
-          })}
+          {items.map((it, i) => (
+            <HolidayRow key={it.id} it={it} last={i === items.length - 1} update={update} remove={remove} />
+          ))}
         </Card>
       )}
       {items.length > 0 && <Body muted small>Press and hold someone to remove them.</Body>}
 
       <Card>
         <H3>{items.length ? 'Add more people' : 'Who do you want to thank?'}</H3>
-        <View style={st.chips}>
-          {unused.map((t) => <Chip key={t.id} label={`+ ${t.who}`} onPress={() => add(t.who, t.id)} />)}
+        <View style={{ gap: 0 }}>
+          {unused.map((t, i) => (
+            <Pressable
+              key={t.id}
+              onPress={() => add(t.who, t)}
+              accessibilityRole="button"
+              accessibilityLabel={`Add ${t.who}. ${t.guide}`}
+              style={({ pressed }) => [st.suggest, i > 0 && { borderTopWidth: 1, borderTopColor: c.line }, pressed && { opacity: 0.7 }]}
+            >
+              <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+                <Text style={{ color: c.ink, fontWeight: '600', fontSize: 15 }}>{t.who}</Text>
+                <Text style={{ color: c.muted, fontSize: 13, lineHeight: 18 }}>{t.guide}</Text>
+              </View>
+              <Text style={{ color: c.accent, fontWeight: '600', fontSize: 15 }}>+ Add</Text>
+            </Pressable>
+          ))}
         </View>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TextInput
@@ -124,13 +121,126 @@ export function HolidayScreen() {
   );
 }
 
+/** One person on the list: guidance, one-tap suggested amounts, and inputs that drive them. */
+function HolidayRow({ it, last, update, remove }: { it: HolidayItem; last: boolean; update: (id: string, p: Partial<HolidayItem>) => void; remove: (it: HolidayItem) => void }) {
+  const c = useColors();
+  const t = HOLIDAY_TEMPLATES.find((x) => x.id === it.templateId);
+  const rec = t?.rec;
+  const each = rec?.kind === 'range' && rec.each;
+  const count = Math.max(1, it.count ?? 1);
+  const sug = rec ? holidaySuggestions(rec, parseAmount(it.base ?? '')) : { amounts: [], prefill: null };
+  const giftOnly = rec?.kind === 'gift';
+  const current = parseAmount(it.amount);
+
+  return (
+    <Pressable onLongPress={() => remove(it)} style={[st.row, !last && { borderBottomWidth: 1, borderBottomColor: c.line }]}>
+      <View style={st.rowTop}>
+        <Checkbox checked={it.given} onToggle={() => update(it.id, { given: !it.given })} label={`Given to ${it.who}`} />
+        <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <Text style={{ color: c.ink, fontWeight: '600', fontSize: 16, textDecorationLine: it.given ? 'line-through' : 'none' }}>{it.who}</Text>
+            {giftOnly && (
+              <View style={[st.tag, { backgroundColor: c.infoBg }]}>
+                <Text style={{ color: c.info, fontSize: 12, fontWeight: '600' }}>Gift only</Text>
+              </View>
+            )}
+          </View>
+          {t && <Text style={{ color: c.muted, fontSize: 13, lineHeight: 18 }}>{t.guide}</Text>}
+        </View>
+        <View style={[st.amount, { borderColor: c.border, backgroundColor: c.surface }]}>
+          <Text style={{ color: c.muted, fontFamily: mono }}>$</Text>
+          <TextInput
+            value={it.amount}
+            onChangeText={(v) => update(it.id, { amount: v.replace(/[^0-9.]/g, '') })}
+            keyboardType="decimal-pad"
+            placeholder="0"
+            placeholderTextColor={c.muted}
+            style={{ flex: 1, color: c.ink, fontFamily: font('mono', 700), fontSize: 15, paddingVertical: 8, paddingHorizontal: 4 }}
+            accessibilityLabel={`${giftOnly ? 'Gift budget' : 'Amount'} for ${it.who}`}
+          />
+        </View>
+      </View>
+
+      {rec?.kind === 'pay' && (
+        <View style={st.inline}>
+          <Text style={{ color: c.ink, fontSize: 14, flex: 1 }}>{rec.ask}</Text>
+          <View style={[st.amount, { borderColor: c.border, backgroundColor: c.surface }]}>
+            <Text style={{ color: c.muted, fontFamily: mono }}>$</Text>
+            <TextInput
+              value={it.base ?? ''}
+              onChangeText={(v) => {
+                const base = v.replace(/[^0-9.]/g, '');
+                const pre = holidaySuggestions(rec, parseAmount(base)).prefill;
+                // Fill the amount from the guide until the person types their own.
+                const touched = it.amount !== '' && parseAmount(it.amount) !== holidaySuggestions(rec, parseAmount(it.base ?? '')).prefill;
+                update(it.id, touched || pre === null ? { base } : { base, amount: String(pre) });
+              }}
+              keyboardType="decimal-pad"
+              placeholder="0"
+              placeholderTextColor={c.muted}
+              style={{ flex: 1, color: c.ink, fontFamily: font('mono'), fontSize: 15, paddingVertical: 8, paddingHorizontal: 4 }}
+              accessibilityLabel={rec.ask}
+            />
+          </View>
+        </View>
+      )}
+
+      {each && (
+        <View style={st.inline}>
+          <Text style={{ color: c.ink, fontSize: 14, flex: 1 }}>How many people?</Text>
+          <View style={st.counter}>
+            {[-1, 1].map((d) => (
+              <Pressable
+                key={d}
+                onPress={() => {
+                  const n = Math.max(1, Math.min(20, count + d));
+                  const per = current / count;
+                  update(it.id, { count: n, amount: current > 0 ? String(Math.round(per * n)) : it.amount });
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={d < 0 ? 'One fewer' : 'One more'}
+                hitSlop={6}
+                style={[st.countBtn, { backgroundColor: c.sunk }]}
+              >
+                <Text style={{ color: c.ink, fontSize: 18, fontWeight: '600' }}>{d < 0 ? '−' : '+'}</Text>
+              </Pressable>
+            ))}
+          </View>
+          <Text style={{ color: c.ink, fontFamily: mono, fontSize: 15, width: 28, textAlign: 'center' }}>{count}</Text>
+        </View>
+      )}
+
+      {sug.amounts.length > 0 && (
+        <View style={st.sugRow}>
+          <Text style={{ color: c.muted, fontSize: 13 }}>Suggested{each ? ' each' : ''}:</Text>
+          {sug.amounts.map((a) => {
+            const total = each ? a.value * count : a.value;
+            const on = Math.abs(current - total) < 0.005;
+            return (
+              <Chip key={a.label} label={each && count > 1 ? `${a.label} × ${count}` : a.label} active={on} onPress={() => update(it.id, { amount: String(total) })} />
+            );
+          })}
+        </View>
+      )}
+      {rec?.kind === 'pay' && rec.orGift && <Text style={{ color: c.muted, fontSize: 13 }}>Or give a gift instead.</Text>}
+    </Pressable>
+  );
+}
+
 const st = StyleSheet.create({
   stats: { flexDirection: 'row', gap: 12 },
   stat: { flex: 1, gap: 2 },
   statLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8 },
   statNum: { fontFamily: mono, fontWeight: '700', fontSize: 24 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14 },
-  amount: { width: 84, flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 8 },
+  row: { gap: 10, paddingVertical: 14, paddingHorizontal: 14 },
+  rowTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  inline: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 44 },
+  sugRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, paddingLeft: 44 },
+  tag: { borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 },
+  counter: { flexDirection: 'row', gap: 8 },
+  countBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  suggest: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, minHeight: 56 },
+  amount: { width: 92, flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 8 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   input: { flex: 1, borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9, fontSize: 15, fontFamily: font('body') },
 });

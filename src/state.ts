@@ -109,6 +109,10 @@ export interface HolidayItem {
   templateId?: string;
   amount: string;
   given: boolean;
+  /** What you usually pay them (a week, a haircut...), for pay-based suggestions. */
+  base?: string;
+  /** How many people, for suggestions given "each" (trash crew, daycare staff). */
+  count?: number;
 }
 
 export interface HolidayPlan {
