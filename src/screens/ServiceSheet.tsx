@@ -121,9 +121,10 @@ export function ServiceSheet({ serviceId, onClose, calc, setBill, onSendToCalcul
               {s.sourceUrl ? (
                 <Text accessibilityRole="link" onPress={() => Linking.openURL(s.sourceUrl!)} style={{ color: c.muted, fontSize: 13 }}>
                   Guidance: <Text style={{ color: c.accent, fontWeight: '600', textDecorationLine: 'underline' }}>{s.source}</Text>
+                  {s.amountsCommon ? '. Dollar amounts are common practice.' : ''}
                 </Text>
               ) : (
-                <Body muted small>Guidance: {s.source}. Source check pending.</Body>
+                <Body muted small>Based on common practice. No published guide found.</Body>
               )}
             </Card>
 

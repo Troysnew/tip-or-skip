@@ -1,0 +1,324 @@
+[
+  {
+    "id": "fastfood",
+    "status": "verified",
+    "source_name": "U.S. News & World Report, syndicated by WTOP",
+    "source_url": "https://wtop.com/news/2026/08/when-its-ok-to-say-no-to-automatic-tip-requests/",
+    "source_quote": "other than that, don\u2019t feel uneasy about paying for only what you bought.",
+    "research_change_summary": "Verdict unchanged. The drive-through section directly supports skipping a tip for routine orders. Added the exception for unusually large or complicated orders.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "catering",
+    "status": "verified",
+    "source_name": "The Knot, with guidance from etiquette and event professionals",
+    "source_url": "https://www.theknot.com/content/wedding-vendor-tipping-cheat-sheet",
+    "source_quote": "For the catering team or waitstaff, consider tipping 15\u201320% of the food and beverage fee.",
+    "research_change_summary": "Range verified for staffed wedding catering, rather than every catering arrangement. Suggested 18% remains an app choice within the published range.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "autograt",
+    "status": "verified",
+    "source_name": "Toast",
+    "source_url": "https://pos.toasttab.com/blog/on-the-line/gratuity-vs-tip",
+    "source_quote": "An additional tip is optional when an automatic gratuity is already included.",
+    "research_change_summary": "No change. Applies when an automatic gratuity has actually been charged; a generic service fee needs clarification.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "sommelier",
+    "status": "held",
+    "source_name": "The Washington Post, quoting wine director Jenn Knowles",
+    "source_url": "https://www.washingtonpost.com/lifestyle/ask-tom-rants-raves-and-questions-on-the-dc-dining-scene/2018/02/07/ecc06bf8-06a8-11e8-aa61-f3391373867e_livediscussion.html",
+    "source_quote": "usually falls in the $20-$50 realm",
+    "research_change_summary": "Replaces 10\u201315% with $20\u2013$50; suggested $20 is app-selected.",
+    "checked": "2026-10-19",
+    "held_values": {
+      "verdict": "optional",
+      "amount_type": "flat",
+      "low": 20,
+      "high": 50,
+      "suggested": 20,
+      "unit": "per dining occasion"
+    }
+  },
+  {
+    "id": "grocery",
+    "status": "verified",
+    "source_name": "Emily Post Institute",
+    "source_url": "https://emilypost.substack.com/p/etiquette-today-everyday-tipping",
+    "source_quote": "tip around 10 percent or $5 or more per order.",
+    "research_change_summary": "Replaced the unsupported 15% upper bound with approximately 10%. Equal endpoints encode a single guideline, not a published range or maximum. A flat alternative is also supported.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "movers",
+    "status": "verified",
+    "source_name": "U-Haul Moving Help",
+    "source_url": "https://www.uhaul.com/Tips/Moving-Help/How-Much-Should-I-Tip-My-Mover-24671/",
+    "source_quote": "About $5 to $10 per person, per hour is typical for an average sized move.",
+    "research_change_summary": "Changed $4\u2013$8 to $5\u2013$10 per mover per hour. Suggested $5 remains an app choice. Retained expected as an interpretation of customary tipping; the source explicitly says tipping is not mandatory and some companies do not accept tips.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "roomservice",
+    "status": "verified",
+    "source_name": "Emily Post Institute",
+    "source_url": "https://emilypost.substack.com/p/etiquette-today-travel-tipping",
+    "source_quote": "15 to 20% of the bill before room-service fees and taxes",
+    "research_change_summary": "Range unchanged. Replaced the unlinked AHLA attribution with Emily Post's direct guidance. Suggested 15% remains an app choice. The included-gratuity caveat is also supported at https://protocolschooloftexas.com/2017/06/22/travel-tipping-etiquette/.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "shuttle",
+    "status": "verified",
+    "source_name": "Emily Post Institute",
+    "source_url": "https://emilypost.substack.com/p/etiquette-today-travel-tipping",
+    "source_quote": "$1 to $2 per bag",
+    "research_change_summary": "Changed optional to expected specifically when luggage assistance is provided, following the source's instruction. Range confirmed; suggested $2 remains an app choice.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "tourguide",
+    "status": "verified",
+    "source_name": "Emily Post Institute",
+    "source_url": "https://emilypost.substack.com/p/etiquette-today-travel-tipping",
+    "source_quote": "$5 to $50",
+    "research_change_summary": "Replaced 10\u201320% with the published $5\u2013$50 short-tour range. Suggested $15 is app-selected. The page does not specify a per-person basis. Removed the unsupported free-walking-tour amount.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "cruise",
+    "status": "verified",
+    "source_name": "Royal Caribbean",
+    "source_url": "https://www.royalcaribbean.com/faq/questions/onboard-service-gratuity-expense",
+    "source_quote": "will have a gratuity amount automatically applied to their respective SeaPass\u00ae account on a daily basis",
+    "research_change_summary": "Retained included only for gratuities already prepaid or applied to the account, not inclusion in the advertised fare. This verifies Royal Caribbean's policy, not every cruise line. Its daily gratuities can be adjusted or removed.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "frontdesk",
+    "status": "verified",
+    "source_name": "Protocol School of Texas, Diane Gottsman",
+    "source_url": "https://protocolschooloftexas.com/2017/06/22/travel-tipping-etiquette/",
+    "source_quote": "Otherwise, a friendly smile and \u201cThank you\u201d is all that is necessary.",
+    "research_change_summary": "Verdict unchanged. Added the source's exception for concierge duties or exceptional assistance.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "airbnb",
+    "status": "blocked",
+    "source_name": "The Washington Post",
+    "source_url": "https://www.washingtonpost.com/travel/tips/airbnb-tip-cleaning-fee/",
+    "source_quote": "Although gratuity is not required",
+    "research_change_summary": "Verdict retained; removed universal cleaning-fee claim. Source concerns housekeeping.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "flight",
+    "status": "blocked",
+    "source_name": "Travel + Leisure",
+    "source_url": "https://www.travelandleisure.com/should-you-tip-your-flight-attendant-11948624",
+    "source_quote": "Tipping flight attendants is generally not expected",
+    "research_change_summary": "Verdict retained.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "gas",
+    "status": "blocked",
+    "source_name": "The Boston Globe, Miss Conduct",
+    "source_url": "https://www.bostonglobe.com/magazine/2014/08/02/everyday-advice-you-tip-full-service-gas-stations/5HcsYk75Zgf13HrdbURLFN/story.html",
+    "source_quote": "These conditions aren\u2019t frequently met, so no tipping required.",
+    "research_change_summary": "Retained.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "carwash",
+    "status": "held",
+    "source_name": "Southern Living, quoting etiquette expert Diane Gottsman",
+    "source_url": "https://www.southernliving.com/how-much-to-tip-at-car-wash-8711250",
+    "source_quote": "Gottsman suggests going for the standard tip rate of 20% of the service",
+    "research_change_summary": "Replaced the $3\u2013$5 flat range with the source's general 20% guideline. Equal endpoints represent a single guideline. The source also permits smaller flat tips for limited assistance.",
+    "checked": "2026-10-19",
+    "held_values": {
+      "verdict": "expected",
+      "amount_type": "pct",
+      "low": 20,
+      "high": 20,
+      "suggested": 20,
+      "unit": ""
+    }
+  },
+  {
+    "id": "tow",
+    "status": "verified",
+    "source_name": "AAA Central Penn",
+    "source_url": "https://centralpenn.aaa.com/automotive/roadside-assistance/towing-service/",
+    "source_quote": "It\u2019s up to you. Tipping your AAA tow truck driver isn\u2019t required.",
+    "research_change_summary": "Verified the optional verdict. Preserved the existing $5\u2013$20 range and $10 suggestion because the source gives no amount. Those dollar values remain unverified and must not be attributed to AAA.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "tattoo",
+    "status": "blocked",
+    "source_name": "InStyle, quoting tattoo artist Pablo Gomez",
+    "source_url": "https://www.instyle.com/tattoo-artist-tipping-guide-7507041",
+    "source_quote": "tipping anywhere from 15 percent to 25 percent of the total cost is considered a good tip",
+    "research_change_summary": "Range retained. Another artist on the page identifies 20% as an average. Removed the unsupported piercing guidance and custom-work restriction.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "makeup",
+    "status": "blocked",
+    "source_name": "Brides, quoting makeup professional Mia Hendrickson",
+    "source_url": "https://www.brides.com/how-much-to-tip-hair-stylist-makeup-artist-5191246",
+    "source_quote": "Per Hendrickson, a standard gratuity amount should fall between 15 and 20 percent of your total service fee.",
+    "research_change_summary": "Range retained; suggested 20% remains an app choice. Limited the note to wedding makeup because that is the source's scope.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "groomer",
+    "status": "replaced",
+    "source_name": "Scenthound",
+    "source_url": "https://www.scenthound.com/dogblog/how-much-do-you-tip-a-dog-groomer",
+    "source_quote": "A tip of 15% of the total bill before taxes signals a job well done.",
+    "research_change_summary": "Range confirmed and suggested 15% retained as an app choice. Expected interprets the source's description of standard tipping, not a mandatory charge. Removed the unsupported matted-pet instruction.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "trainer",
+    "status": "verified",
+    "source_name": "Emily Post Institute",
+    "source_url": "https://emilypost.substack.com/p/etiquette-today-everyday-tipping",
+    "source_quote": "15 to 20 percent",
+    "research_change_summary": "Changed from not to expected for individual personal-training services, following the paragraph that explicitly names personal training. Added the same page's recurring-service qualification. Suggested 15% is app-selected; this is not a universal instruction to tip after every recurring session.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "repair",
+    "status": "verified",
+    "source_name": "TheStreet, quoting Jacqueline Whitmore",
+    "source_url": "https://www.thestreet.com/personal-finance/how-much-should-i-tip-an-essential-guide-to-giving-out-gratuities-13067533",
+    "source_quote": "kind of like the plumber or the telephone guy.",
+    "research_change_summary": "Verdict retained. Whitmore compares cable installation with plumbing when explaining why tipping is unnecessary. Applying this to electricians and the broader repair category is an interpretation; not every repair trade is directly covered.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "cleaner",
+    "status": "blocked",
+    "source_name": "Southern Living, quoting cleaning-company owner Marlo McKelvey Kanipe",
+    "source_url": "https://www.southernliving.com/should-you-tip-your-house-cleaner-7852315",
+    "source_quote": "On average, tips range from 15 to 20 percent of the price the client paid for their service.",
+    "research_change_summary": "Verdict and range retained; suggested 15% remains an app choice. Removed the exact one-visit holiday amount because this source does not specify it.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "lawn",
+    "status": "verified",
+    "source_name": "Emily Post Institute",
+    "source_url": "https://emilypost.substack.com/p/etiquette-today-everyday-tipping",
+    "source_quote": "tipping is often reserved for the end of the year.",
+    "research_change_summary": "Verdict retained for routine recurring service. The source discusses set-rate recurring services and explicitly includes gardeners; it allows extra tips for exceptional help rather than prohibiting them.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "assembly",
+    "status": "verified",
+    "source_name": "Taskrabbit",
+    "source_url": "https://www.taskrabbit.com/cost-guides/assemble-furniture",
+    "source_quote": "Typically is not necessarily required, but it is customary to include 10-20% gratuity for their work.",
+    "research_change_summary": "Verdict and range retained. Suggested 15% remains an app choice within the published range. The grammatical error in the quotation appears on the source page.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "babysitter",
+    "status": "verified",
+    "source_name": "Care.com",
+    "source_url": "https://www.care.com/c/should-you-tip-a-babysitter/",
+    "source_quote": "Tipping a babysitter is \u201cnot required and optional,\u201d says Stephanie Fornaro, founder of Hello, Nanny!",
+    "research_change_summary": "Verdict unchanged. Zeros represent no fixed recommendation, not a recommended $0 tip; the requested schema has no no-amount type for optional services. Special-event and hotel babysitting have separate guidance.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "trash",
+    "status": "verified",
+    "source_name": "Emily Post Institute",
+    "source_url": "https://emilypost.com/advice/holiday-tipping-guide",
+    "source_quote": "Suggested Amount or Gift: $10-30 each",
+    "research_change_summary": "Range and holiday context confirmed. Suggested $20 remains the app's selection within the range, not a source-prescribed amount.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "installer",
+    "status": "verified",
+    "source_name": "TheStreet, quoting Jacqueline Whitmore",
+    "source_url": "https://www.thestreet.com/personal-finance/how-much-should-i-tip-an-essential-guide-to-giving-out-gratuities-13067533",
+    "source_quote": "Contrary to popular belief, it isn\u2019t necessary to tip your cable guy.",
+    "research_change_summary": "Verdict retained for routine installation. Removed the unsupported claim that many companies forbid tips. The article also quotes an expert who favors optional tipping.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "coat",
+    "status": "blocked",
+    "source_name": "Better Homes & Gardens, quoting Jacqueline Whitmore",
+    "source_url": "https://www.bhg.com/who-to-tip-etiquette-8724668",
+    "source_quote": "How much to tip: $1 to $2",
+    "research_change_summary": "Range confirmed; narrowed the unit to a coat. Suggested $2 remains app-selected. Removed the unverified free-check claim.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "stadium",
+    "status": "unsourced",
+    "source_name": "",
+    "source_url": "",
+    "source_quote": "",
+    "research_change_summary": "Current values retained. No qualifying source was verified for the seat-side vendor recommendation and $1\u2013$2 range. These amounts remain unverified.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "retail",
+    "status": "verified",
+    "source_name": "U.S. News & World Report, syndicated by WTOP",
+    "source_url": "https://wtop.com/news/2026/08/when-its-ok-to-say-no-to-automatic-tip-requests/",
+    "source_quote": "You needn\u2019t agree",
+    "research_change_summary": "Verdict retained. The retail section supports declining a tip request; a separate self-checkout section supports the same conclusion.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "doctor",
+    "status": "verified",
+    "source_name": "Emily Post Institute",
+    "source_url": "https://emilypost.com/advice/holiday-tips-vs.-holiday-gifts",
+    "source_quote": "Cash gifts may be prohibited.",
+    "research_change_summary": "Verdict retained. Institutional restrictions vary; the source groups health care professionals with gift recipients rather than tipped workers.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "teacher",
+    "status": "verified",
+    "source_name": "Emily Post Institute",
+    "source_url": "https://emilypost.com/advice/holiday-tips-vs.-holiday-gifts",
+    "source_quote": "Teachers are salaried professionals--a cash tip is not appropriate",
+    "research_change_summary": "Verdict retained. Gift rules depend on the school; no universal dollar limit is asserted.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "musician",
+    "status": "blocked",
+    "source_name": "Better Homes & Gardens, quoting Jacqueline Whitmore",
+    "source_url": "https://www.bhg.com/who-to-tip-etiquette-8724668",
+    "source_quote": "How much to tip: $1 to $5",
+    "research_change_summary": "Range confirmed. Optional interprets the recommendation; suggested $2 remains app-selected.",
+    "checked": "2026-10-19"
+  },
+  {
+    "id": "caddie",
+    "status": "replaced",
+    "source_name": "GOLF.com",
+    "source_url": "https://golf.com/instruction/proper-amount-to-tip-caddie/",
+    "source_quote": "it's usually safe to go by the restaurant rule: a 20 percent tip for a job well done.",
+    "research_change_summary": "Replaced zero amounts with Pinehurst's $65 walking-caddie baseline. Equal endpoints encode the published starting amount because the schema cannot express an open-ended minimum. $65 is not a maximum or a national rate. Forecaddies have different guidance.",
+    "checked": "2026-10-19"
+  }
+]
