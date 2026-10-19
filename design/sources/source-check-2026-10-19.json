@@ -28,7 +28,7 @@
   },
   {
     "id": "sommelier",
-    "status": "held",
+    "status": "verified (second research set)",
     "source_name": "The Washington Post, quoting wine director Jenn Knowles",
     "source_url": "https://www.washingtonpost.com/lifestyle/ask-tom-rants-raves-and-questions-on-the-dc-dining-scene/2018/02/07/ecc06bf8-06a8-11e8-aa61-f3391373867e_livediscussion.html",
     "source_quote": "usually falls in the $20-$50 realm",
@@ -41,7 +41,16 @@
       "high": 50,
       "suggested": 20,
       "unit": "per dining occasion"
-    }
+    },
+    "second_sources": [
+      {
+        "source_name": "Wine Spectator",
+        "source_url": "https://www.winespectator.com/articles/what-is-the-proper-etiquette-for-tipping-a-sommelier-at-a-restaurant-45652",
+        "source_quote": "It's rare for a sommelier to be tipped separately.",
+        "checked": "2026-10-19",
+        "status": "verified"
+      }
+    ]
   },
   {
     "id": "grocery",
@@ -50,7 +59,16 @@
     "source_url": "https://emilypost.substack.com/p/etiquette-today-everyday-tipping",
     "source_quote": "tip around 10 percent or $5 or more per order.",
     "research_change_summary": "Replaced the unsupported 15% upper bound with approximately 10%. Equal endpoints encode a single guideline, not a published range or maximum. A flat alternative is also supported.",
-    "checked": "2026-10-19"
+    "checked": "2026-10-19",
+    "second_sources": [
+      {
+        "source_name": "WalletHub",
+        "source_url": "https://wallethub.com/edu/b/how-much-to-tip/154692",
+        "source_quote": "10% to 20% of the bill is typically the recommended amount.",
+        "checked": "2026-10-19",
+        "status": "verified"
+      }
+    ]
   },
   {
     "id": "movers",
@@ -59,7 +77,16 @@
     "source_url": "https://www.uhaul.com/Tips/Moving-Help/How-Much-Should-I-Tip-My-Mover-24671/",
     "source_quote": "About $5 to $10 per person, per hour is typical for an average sized move.",
     "research_change_summary": "Changed $4\u2013$8 to $5\u2013$10 per mover per hour. Suggested $5 remains an app choice. Retained expected as an interpretation of customary tipping; the source explicitly says tipping is not mandatory and some companies do not accept tips.",
-    "checked": "2026-10-19"
+    "checked": "2026-10-19",
+    "second_sources": [
+      {
+        "source_name": "WalletHub",
+        "source_url": "https://wallethub.com/edu/b/how-much-to-tip/154692",
+        "source_quote": "$4 to $10 per mover, per hour",
+        "checked": "2026-10-19",
+        "status": "verified"
+      }
+    ]
   },
   {
     "id": "roomservice",
@@ -77,7 +104,16 @@
     "source_url": "https://emilypost.substack.com/p/etiquette-today-travel-tipping",
     "source_quote": "$1 to $2 per bag",
     "research_change_summary": "Changed optional to expected specifically when luggage assistance is provided, following the source's instruction. Range confirmed; suggested $2 remains an app choice.",
-    "checked": "2026-10-19"
+    "checked": "2026-10-19",
+    "second_sources": [
+      {
+        "source_name": "WalletHub",
+        "source_url": "https://wallethub.com/edu/b/how-much-to-tip/154692",
+        "source_quote": "You can tip shuttle drivers at places like airports and hotels $1 to $2 per person, though it's not expected.",
+        "checked": "2026-10-19",
+        "status": "verified"
+      }
+    ]
   },
   {
     "id": "tourguide",
@@ -122,7 +158,16 @@
     "source_url": "https://www.travelandleisure.com/should-you-tip-your-flight-attendant-11948624",
     "source_quote": "Tipping flight attendants is generally not expected",
     "research_change_summary": "Verdict retained.",
-    "checked": "2026-10-19"
+    "checked": "2026-10-19",
+    "second_sources": [
+      {
+        "source_name": "Association of Flight Attendants",
+        "source_url": "https://afacwa.org/afa_statement_on_frontier_tipping_policy/",
+        "source_quote": "Tipping is not part of a Flight Attendant's compensation for serving as aviation's first responders.",
+        "checked": "2026-10-19",
+        "status": "verified"
+      }
+    ]
   },
   {
     "id": "gas",
@@ -135,7 +180,7 @@
   },
   {
     "id": "carwash",
-    "status": "held",
+    "status": "verified (second research set)",
     "source_name": "Southern Living, quoting etiquette expert Diane Gottsman",
     "source_url": "https://www.southernliving.com/how-much-to-tip-at-car-wash-8711250",
     "source_quote": "Gottsman suggests going for the standard tip rate of 20% of the service",
@@ -148,7 +193,16 @@
       "high": 20,
       "suggested": 20,
       "unit": ""
-    }
+    },
+    "second_sources": [
+      {
+        "source_name": "Money Talks News",
+        "source_url": "https://www.moneytalksnews.com/slideshows/the-ultimate-tipping-guide-on-how-much-to-leave-in-every-situation/",
+        "source_quote": "Basic car wash and towel drying is $2-$5, and the tipping amount goes up as more services are added.",
+        "checked": "2026-10-19",
+        "status": "verified"
+      }
+    ]
   },
   {
     "id": "tow",
@@ -193,7 +247,16 @@
     "source_url": "https://emilypost.substack.com/p/etiquette-today-everyday-tipping",
     "source_quote": "15 to 20 percent",
     "research_change_summary": "Changed from not to expected for individual personal-training services, following the paragraph that explicitly names personal training. Added the same page's recurring-service qualification. Suggested 15% is app-selected; this is not a universal instruction to tip after every recurring session.",
-    "checked": "2026-10-19"
+    "checked": "2026-10-19",
+    "second_sources": [
+      {
+        "source_name": "theSkimm",
+        "source_url": "https://www.theskimm.com/wellness/how-much-to-tip-for-wellness-services",
+        "source_quote": "Most personal trainers and private yoga instructors also don't expect tips at the end of every session.",
+        "checked": "2026-10-19",
+        "status": "verified"
+      }
+    ]
   },
   {
     "id": "repair",
@@ -202,7 +265,16 @@
     "source_url": "https://www.thestreet.com/personal-finance/how-much-should-i-tip-an-essential-guide-to-giving-out-gratuities-13067533",
     "source_quote": "kind of like the plumber or the telephone guy.",
     "research_change_summary": "Verdict retained. Whitmore compares cable installation with plumbing when explaining why tipping is unnecessary. Applying this to electricians and the broader repair category is an interpretation; not every repair trade is directly covered.",
-    "checked": "2026-10-19"
+    "checked": "2026-10-19",
+    "second_sources": [
+      {
+        "source_name": "Money, quoting Jodi R.R. Smith",
+        "source_url": "https://money.com/tipping-guide-home-maintenance/",
+        "source_quote": "Don't tip skilled craftsmen or technical specialists, such as plumbers, electricians, painters, alarm service technicians, handymen, piano tuners, or appliance repair people.",
+        "checked": "2026-10-19",
+        "status": "verified"
+      }
+    ]
   },
   {
     "id": "cleaner",
@@ -319,6 +391,15 @@
     "source_url": "https://golf.com/instruction/proper-amount-to-tip-caddie/",
     "source_quote": "it's usually safe to go by the restaurant rule: a 20 percent tip for a job well done.",
     "research_change_summary": "Replaced zero amounts with Pinehurst's $65 walking-caddie baseline. Equal endpoints encode the published starting amount because the schema cannot express an open-ended minimum. $65 is not a maximum or a national rate. Forecaddies have different guidance.",
-    "checked": "2026-10-19"
+    "checked": "2026-10-19",
+    "second_sources": [
+      {
+        "source_name": "Golf Digest",
+        "source_url": "https://www.golfdigest.com/story/money-tipping-gambling-and-buying-stuff-at-the-course",
+        "source_quote": "typically about 30-40 percent of the caddie fee",
+        "checked": "2026-10-19",
+        "status": "verified"
+      }
+    ]
   }
 ]
