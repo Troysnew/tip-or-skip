@@ -51,6 +51,7 @@ jobs:
           code=${PIPESTATUS[0]}
           if [ "$code" != "0" ]; then
             # Surface the end of the output as annotations, readable without the full log.
-            tail -25 eas.log | sed 's/\x1b\[[0-9;]*m//g' | grep -v '^\s*$' | while IFS= read -r line; do echo "::error::$line"; done
+            msg=$(tail -40 eas.log | sed 's/\x1b\[[0-9;]*m//g' | grep -v '^\s*$' | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=EAS output::$msg"
           fi
           exit $code
