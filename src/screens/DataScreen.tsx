@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Linking, View } from 'react-native';
 import { Text } from '../components/Text';
 import { Body, Btn, Card, H2, H3, ProTag } from '../components/ui';
 import { PRO_PRICE, TEST_MODE } from '../pro/purchases';
+import { HANDLE_APPS, hasHandles } from '../lib/pay';
 import { useStore } from '../store';
+import { HandlesSheet } from './SettleUp';
 import { useColors } from '../theme';
 
 function Link({ url, children }: { url: string; children: string }) {
@@ -17,7 +19,9 @@ function Link({ url, children }: { url: string; children: string }) {
 
 export function DataScreen() {
   const c = useColors();
-  const { pro, setPro, requests, openPaywall, flash } = useStore();
+  const { pro, setPro, requests, openPaywall, flash, payHandles, requestApps } = useStore();
+  const [editingHandles, setEditingHandles] = useState(false);
+  const prefix = { venmo: '@', cashtag: '$', paypal: 'paypal.me/' } as const;
   return (
     <View style={{ gap: 12 }}>
       <Card>
@@ -42,7 +46,21 @@ export function DataScreen() {
           </>
         )}
       </Card>
-      <Text style={{ color: c.muted, fontSize: 12 }}>Version 0.7.7</Text>
+      <Card>
+        <H3>How friends pay you</H3>
+        {hasHandles(payHandles) ? (
+          HANDLE_APPS.filter((a) => payHandles[a.key]).map((a) => (
+            <Body key={a.key}>
+              {a.name}: {prefix[a.key]}{payHandles[a.key]}{requestApps[a.key] === false ? ' (off in requests)' : ''}
+            </Body>
+          ))
+        ) : (
+          <Body muted small>Add your Venmo, Cash App or PayPal.Me names. Payment requests include them as pay links with the amount filled in. Saved on this phone only.</Body>
+        )}
+        <Btn small ghost title={hasHandles(payHandles) ? 'Edit' : 'Add'} onPress={() => setEditingHandles(true)} />
+      </Card>
+      <HandlesSheet visible={editingHandles} onClose={() => setEditingHandles(false)} />
+      <Text style={{ color: c.muted, fontSize: 12 }}>Version 0.7.8</Text>
       <View style={{ gap: 4 }}>
         <H2>Where the numbers come from</H2>
         <Body muted>Stats appear only where a published survey measured that service. Everything else waits for in-app responses.</Body>
@@ -62,7 +80,7 @@ export function DataScreen() {
       </Card>
       <Card>
         <H3>Etiquette guidance</H3>
-        <Body>27 services and the holiday planner follow the Emily Post Institute's published guides, and each links to its page. Room service follows AHLA guidance. 33 services marked Common US guidance still need a source check before launch.</Body>
+        <Body>60 of 61 services cite a published guide or article, linked on each service. Tipping stadium vendors is based on common practice. The holiday planner follows the Emily Post Institute's holiday guide.</Body>
         <View style={{ flexDirection: 'row', gap: 16 }}>
           <Link url="https://emilypost.com/advice/general-tipping-guide">Tipping guide</Link>
           <Link url="https://emilypost.com/advice/holiday-tipping-guide">Holiday guide</Link>

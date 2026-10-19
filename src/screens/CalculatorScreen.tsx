@@ -13,8 +13,7 @@ import { applyPreset, blankPeople, initialCalc, newId, presetFrom, withService, 
 import { useProGate, useStore } from '../store';
 import { mono, space, useColors } from '../theme';
 import { canScanReceipts, ReceiptScreen } from './ReceiptScreen';
-import { HandlesSheet, PaySheet, useRequest, type PayMode } from './SettleUp';
-import { hasHandles } from '../lib/pay';
+import { PaySheet, useRequest, type PayMode } from './SettleUp';
 
 /** Default tip cards when no service is picked (Modern Mint: three cards, then Custom tip / No tip). */
 const DEFAULT_PCTS = [15, 18, 20];
@@ -27,14 +26,13 @@ interface Props {
 
 export function CalculatorScreen({ state, setState, onOpenService }: Props) {
   const c = useColors();
-  const { pro, presets, setPresets, setHistory, flash, openPaywall, payHandles } = useStore();
+  const { pro, presets, setPresets, setHistory, flash, openPaywall } = useStore();
   const gate = useProGate();
   const [query, setQuery] = useState('');
   const [naming, setNaming] = useState<string | null>(null);
   const [customOpen, setCustomOpen] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [paying, setPaying] = useState(false);
-  const [editingHandles, setEditingHandles] = useState(false);
   const { request, sheet: requestSheet } = useRequest();
 
   const svc = state.serviceId ? byId(state.serviceId) : undefined;
@@ -411,11 +409,6 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
               </View>
             ))}
           </Card>
-          {pro && hasHandles(payHandles) && (
-            <Text accessibilityRole="button" onPress={() => setEditingHandles(true)} style={{ color: c.accent, fontSize: 14, fontWeight: '600' }}>
-              Edit how friends pay you
-            </Text>
-          )}
           {itemResult.over > 0.004 && (
             <Text style={{ color: c.warn, fontSize: 14 }}>The amounts add up to {money(itemResult.over)} more than the bill before tax. Check them.</Text>
           )}
@@ -470,7 +463,6 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
       {!svc && <Text style={{ color: c.muted, fontSize: 14, textAlign: 'center' }}>Not sure what to tip? Type what it's for in the search box above.</Text>}
 
       <PaySheet visible={paying} full={payAmount} tip={payTip} defaultMode={payDefault} onClose={() => setPaying(false)} />
-      <HandlesSheet visible={editingHandles} onClose={() => setEditingHandles(false)} />
       {requestSheet}
 
       <ReceiptScreen

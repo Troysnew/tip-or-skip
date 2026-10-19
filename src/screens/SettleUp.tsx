@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Linking, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Clipboard from 'expo-clipboard';
@@ -6,7 +6,7 @@ import { Icon } from '../components/icons';
 import { Text } from '../components/Text';
 import { Body, Btn, Label } from '../components/ui';
 import { font } from '../fonts';
-import { cleanHandle, hasHandles, openPayApp, PAY_APPS, requestMessage, type PayHandles, type RequestInput } from '../lib/pay';
+import { cleanHandle, HANDLE_APPS, hasHandles, openPayApp, PAY_APPS, pickHandles, requestMessage, roundUpDollar, type PayHandles, type RequestInput } from '../lib/pay';
 import { money } from '../lib/tip';
 import { useProGate, useStore } from '../store';
 import { mono, space, useColors } from '../theme';
@@ -196,35 +196,172 @@ export function HandlesSheet({ visible, onClose, onSaved }: { visible: boolean; 
   );
 }
 
+type AmountMode = 'exact' | 'round' | 'other';
+
+/**
+ * Pro: the step before a request goes out. Choose the amount (exact, rounded up to the dollar,
+ * or typed in) and which of the saved pay apps to include, then send through the share sheet.
+ */
+function RequestSheet({ input, onClose, onEditHandles, onSend }: {
+  input: RequestInput | null;
+  onClose: () => void;
+  onEditHandles: () => void;
+  onSend: (r: RequestInput, handles: PayHandles) => void;
+}) {
+  const c = useColors();
+  const { payHandles, requestApps, setRequestApps } = useStore();
+  const [mode, setMode] = useState<AmountMode>('exact');
+  const [other, setOther] = useState('');
+  useEffect(() => {
+    if (input) {
+      setMode('exact');
+      setOther('');
+    }
+  }, [input]);
+
+  const exact = input?.amount ?? 0;
+  const rounded = roundUpDollar(exact);
+  const canRound = rounded - exact > 0.004;
+  const typed = Math.max(0, parseFloat(other.replace(/[^0-9.]/g, '')) || 0);
+  const amount = mode === 'round' && canRound ? rounded : mode === 'other' ? typed : exact;
+  const saved = HANDLE_APPS.filter((a) => payHandles[a.key]);
+  const chosen = pickHandles(payHandles, requestApps);
+  const ready = amount > 0 && hasHandles(chosen);
+  const who = input?.name?.trim();
+
+  const choice = (m: AmountMode, label: string, sub?: string) => (
+    <Pressable
+      key={m}
+      onPress={() => setMode(m)}
+      accessibilityRole="radio"
+      accessibilityState={{ selected: mode === m }}
+      style={[st.choice, { borderColor: mode === m ? c.selected : c.border, backgroundColor: mode === m ? c.selected : c.surface }]}
+    >
+      <Text style={{ color: mode === m ? c.onSelected : c.ink, fontWeight: '600', fontSize: 14 }}>{label}</Text>
+      {sub ? <Text style={{ color: mode === m ? c.onSelected : c.muted, fontFamily: mono, fontSize: 14 }}>{sub}</Text> : null}
+    </Pressable>
+  );
+
+  return (
+    <Sheet visible={input !== null} onClose={onClose} title={who ? `Request from ${who}` : 'Request'}>
+      <View style={st.choices}>
+        {choice('exact', 'Exact', money(exact))}
+        {canRound && choice('round', 'Round up', money(rounded))}
+        {choice('other', 'Other')}
+      </View>
+      {mode === 'other' ? (
+        <View style={[st.amount, { backgroundColor: c.result }]}>
+          <Text style={{ color: c.onResult, fontSize: 14, fontWeight: '600' }}>Amount</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={{ color: c.onResult, fontFamily: mono, fontSize: 40, lineHeight: 46 }}>$</Text>
+            <TextInput
+              autoFocus
+              value={other}
+              onChangeText={(t) => setOther(t.replace(/[^0-9.]/g, ''))}
+              keyboardType="decimal-pad"
+              placeholder={exact.toFixed(2)}
+              placeholderTextColor="rgba(24,35,34,0.45)"
+              style={{ flex: 1, color: c.onResult, fontFamily: font('mono'), fontSize: 40, paddingVertical: 0, fontVariant: ['tabular-nums'] }}
+              accessibilityLabel="Amount to request"
+            />
+          </View>
+        </View>
+      ) : (
+        <View style={[st.amount, { backgroundColor: c.result }]}>
+          <Text style={{ color: c.onResult, fontSize: 14, fontWeight: '600' }}>Amount</Text>
+          <Text style={{ color: c.onResult, fontFamily: mono, fontSize: 40, lineHeight: 46 }}>{money(amount)}</Text>
+        </View>
+      )}
+      <Label>Pay links to include</Label>
+      {saved.map((a) => {
+        const on = requestApps[a.key] !== false;
+        const prefix = a.key === 'venmo' ? '@' : a.key === 'cashtag' ? '$' : 'paypal.me/';
+        return (
+          <Pressable
+            key={a.key}
+            onPress={() => setRequestApps((r) => ({ ...r, [a.key]: !on }))}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: on }}
+            accessibilityLabel={a.name}
+            style={({ pressed }) => [st.row, { borderColor: on ? c.selected : c.border, backgroundColor: c.surface }, pressed && { opacity: 0.75 }]}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: c.ink, fontWeight: '600', fontSize: 16 }}>{a.name}</Text>
+              <Text style={{ color: c.muted, fontSize: 13 }} numberOfLines={1}>{prefix}{payHandles[a.key]}</Text>
+            </View>
+            <View style={[st.box, { borderColor: on ? c.selected : c.border, backgroundColor: on ? c.selected : 'transparent' }]}>
+              {on && <Icon name="check" color={c.onSelected} size={16} />}
+            </View>
+          </Pressable>
+        );
+      })}
+      <Text accessibilityRole="button" onPress={onEditHandles} style={{ color: c.accent, fontSize: 14, fontWeight: '600', paddingVertical: 4 }}>
+        Edit how friends pay you
+      </Text>
+      {!hasHandles(chosen) && <Body muted small>Turn on at least one app to send a request.</Body>}
+      <Btn
+        title={ready ? `Send request for ${money(amount)}` : 'Send request'}
+        onPress={() => {
+          if (!input || !ready) return;
+          onSend({ ...input, amount, exact }, chosen);
+        }}
+      />
+    </Sheet>
+  );
+}
+
 /**
  * Pro: send someone a payment request through the phone's share sheet (Messages, WhatsApp...).
- * Asks for pay usernames first if none are saved.
+ * Asks for pay usernames first if none are saved, then shows the Request sheet.
  */
 export function useRequest() {
   const { payHandles } = useStore();
   const gate = useProGate();
+  // Only one sheet is open at a time: iOS can't show two modals at once.
   const [pending, setPending] = useState<RequestInput | null>(null);
+  const [stage, setStage] = useState<'request' | 'handles' | null>(null);
+  // Editing pay names from the Request sheet returns to it afterwards.
+  const fromRequest = useRef(false);
+
+  const later = (f: () => void) => setTimeout(f, 350);
 
   const send = (r: RequestInput, handles: PayHandles) => {
-    Share.share({ message: requestMessage(handles, r) }).catch(() => {});
+    setStage(null);
+    later(() => Share.share({ message: requestMessage(handles, r) }).catch(() => {}));
   };
 
   const request = (r: RequestInput) =>
     gate('Payment requests', () => {
-      if (hasHandles(payHandles)) send(r, payHandles);
-      else setPending(r);
+      setPending(r);
+      fromRequest.current = false;
+      setStage(hasHandles(payHandles) ? 'request' : 'handles');
     });
 
   const sheet = (
-    <HandlesSheet
-      visible={pending !== null}
-      onClose={() => setPending(null)}
-      onSaved={(h) => {
-        const r = pending;
-        setPending(null);
-        if (r && hasHandles(h)) setTimeout(() => send(r, h), 350);
-      }}
-    />
+    <>
+      <RequestSheet
+        input={stage === 'request' ? pending : null}
+        onClose={() => setStage(null)}
+        onEditHandles={() => {
+          fromRequest.current = true;
+          setStage(null);
+          later(() => setStage('handles'));
+        }}
+        onSend={send}
+      />
+      <HandlesSheet
+        visible={stage === 'handles'}
+        onClose={() => {
+          setStage(null);
+          if (fromRequest.current && hasHandles(payHandles)) later(() => setStage('request'));
+          fromRequest.current = false;
+        }}
+        onSaved={(h) => {
+          setStage(null);
+          if (pending && hasHandles(h)) later(() => setStage('request'));
+        }}
+      />
+    </>
   );
   return { request, sheet };
 }
@@ -238,5 +375,6 @@ const st = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1.5, borderRadius: space.controlRadius, minHeight: 56, paddingHorizontal: 16 },
   choices: { flexDirection: 'row', gap: 8 },
   choice: { flex: 1, borderWidth: 1.5, borderRadius: space.controlRadius, minHeight: 56, alignItems: 'center', justifyContent: 'center', paddingVertical: 8, gap: 2 },
+  box: { width: 26, height: 26, borderRadius: 7, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   input: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: space.controlRadius, paddingHorizontal: 12, minHeight: space.target },
 });

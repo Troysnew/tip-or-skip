@@ -68,6 +68,28 @@ export function cleanHandle(app: keyof PayHandles, raw: string): string {
 
 export const hasHandles = (h: PayHandles) => !!(h.venmo || h.cashtag || h.paypal);
 
+/** Which saved apps go into a request. Remembered between requests; new apps start switched on. */
+export type RequestApps = Record<keyof PayHandles, boolean>;
+export const allRequestApps: RequestApps = { venmo: true, cashtag: true, paypal: true };
+
+export const HANDLE_APPS: { key: keyof PayHandles; name: string }[] = [
+  { key: 'venmo', name: 'Venmo' },
+  { key: 'cashtag', name: 'Cash App' },
+  { key: 'paypal', name: 'PayPal' },
+];
+
+/** The saved handles with any switched-off apps left out. */
+export function pickHandles(h: PayHandles, apps: RequestApps): PayHandles {
+  return {
+    venmo: apps.venmo !== false ? h.venmo : '',
+    cashtag: apps.cashtag !== false ? h.cashtag : '',
+    paypal: apps.paypal !== false ? h.paypal : '',
+  };
+}
+
+/** Up to the next whole dollar ($20.24 becomes $21). Whole-dollar amounts stay as they are. */
+export const roundUpDollar = (v: number) => Math.ceil(Math.round(v * 100) / 100 - 1e-9);
+
 const amt = (v: number) => (Math.ceil(v * 100 - 1e-9) / 100).toFixed(2);
 const usd = (v: number) => `$${amt(v)}`;
 
@@ -88,6 +110,8 @@ export interface RequestInput {
   label?: string;
   /** Optional breakdown for a split by item. */
   parts?: { food: number; tax: number; tip: number };
+  /** The exact share, when `amount` was rounded up or typed in. */
+  exact?: number;
 }
 
 /** The text sent through the share sheet: the amount, a short breakdown, and pay links. */
@@ -96,7 +120,9 @@ export function requestMessage(h: PayHandles, r: RequestInput): string {
   const forWhat = what && what !== 'tip' ? ` for ${what}` : '';
   const hi = r.name?.trim() ? `Hi ${r.name.trim()}! ` : '';
   const lines = [`${hi}Your share${forWhat} is ${usd(r.amount)}.`];
-  if (r.parts) lines.push(`(${usd(r.parts.food)} food + ${usd(r.parts.tax)} tax + ${usd(r.parts.tip)} tip)`);
+  // The breakdown only adds up to the exact share, so it is left out when the amount was changed.
+  const exact = r.exact === undefined || Math.abs(r.exact - r.amount) < 0.005;
+  if (r.parts && exact) lines.push(`(${usd(r.parts.food)} food + ${usd(r.parts.tax)} tax + ${usd(r.parts.tip)} tip)`);
   const note = `Your share${forWhat}`.trim();
   const links = requestLinks(h, r.amount, note);
   if (links.length) {

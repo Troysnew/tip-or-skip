@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
 import { usePersistentState } from './lib/storage';
 import type { HistoryEntry, HolidayPlan, Polls, Preset } from './state';
-import { emptyHandles, type PayHandles } from './lib/pay';
+import { allRequestApps, emptyHandles, type PayHandles, type RequestApps } from './lib/pay';
 
 interface Store {
   pro: boolean;
@@ -19,6 +19,9 @@ interface Store {
   /** The person's own Venmo, Cash App and PayPal usernames, for payment requests. */
   payHandles: PayHandles;
   setPayHandles: React.Dispatch<React.SetStateAction<PayHandles>>;
+  /** Which saved pay apps go into requests. */
+  requestApps: RequestApps;
+  setRequestApps: React.Dispatch<React.SetStateAction<RequestApps>>;
   /** Open the upgrade screen. `feature` names what the person tapped. */
   paywall: string | null;
   openPaywall: (feature: string) => void;
@@ -37,6 +40,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [polls, setPolls] = usePersistentState<Polls>('tos.polls', {});
   const [requests, setRequests] = usePersistentState<string[]>('tos.requests', []);
   const [payHandles, setPayHandles] = usePersistentState<PayHandles>('tos.payHandles', emptyHandles);
+  const [requestApps, setRequestApps] = usePersistentState<RequestApps>('tos.requestApps', allRequestApps);
   const [paywall, setPaywall] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -49,7 +53,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const value: Store = {
     pro, setPro, history, setHistory, presets, setPresets, holiday, setHoliday,
-    polls, setPolls, requests, setRequests, payHandles, setPayHandles,
+    polls, setPolls, requests, setRequests, payHandles, setPayHandles, requestApps, setRequestApps,
     paywall, openPaywall: setPaywall, closePaywall: () => setPaywall(null),
     toast, flash,
   };
