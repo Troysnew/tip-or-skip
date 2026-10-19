@@ -44,4 +44,13 @@ jobs:
         run: npm ci
 
       - name: Build and submit to TestFlight
-        run: eas build --platform ios --profile production --non-interactive --auto-submit --no-wait
+        run: |
+          eas --version
+          set +e
+          eas build --platform ios --profile production --non-interactive --auto-submit --no-wait 2>&1 | tee eas.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" != "0" ]; then
+            # Surface the end of the output as annotations, readable without the full log.
+            tail -25 eas.log | sed 's/\x1b\[[0-9;]*m//g' | grep -v '^\s*$' | while IFS= read -r line; do echo "::error::$line"; done
+          fi
+          exit $code
