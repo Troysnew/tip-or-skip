@@ -129,6 +129,6 @@ export function requestMessage(h: PayHandles, r: RequestInput): string {
     lines.push('', 'Pay me here:');
     for (const l of links) lines.push(`${l.app}: ${l.url}`);
   }
-  lines.push('', 'Split with Tip or Skip');
+  lines.push('', 'Split with Tip or Skip: https://tiporskip.app');
   return lines.join('\n');
 }
