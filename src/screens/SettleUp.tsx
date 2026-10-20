@@ -167,7 +167,7 @@ export function HandlesSheet({ visible, onClose, onSaved }: { visible: boolean; 
           placeholderTextColor={c.muted}
           autoCapitalize="none"
           autoCorrect={false}
-          style={{ flex: 1, color: c.ink, fontSize: 16, fontFamily: font('body'), paddingVertical: 12, paddingHorizontal: 4 }}
+          style={{ flex: 1, color: c.ink, fontSize: 16, fontFamily: font('body'), alignSelf: 'stretch', paddingVertical: 0, paddingHorizontal: 4 }}
           accessibilityLabel={`${label} username`}
         />
       </View>

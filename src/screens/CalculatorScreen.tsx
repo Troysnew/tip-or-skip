@@ -349,7 +349,7 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
                   keyboardType="decimal-pad"
                   placeholder="0.00"
                   placeholderTextColor={c.muted}
-                  style={{ flex: 1, color: c.ink, fontFamily: font('mono'), fontSize: 16, paddingVertical: 10, paddingHorizontal: 4, fontVariant: ['tabular-nums'] }}
+                  style={{ flex: 1, color: c.ink, fontFamily: font('mono'), fontSize: 16, alignSelf: 'stretch', paddingVertical: 0, paddingHorizontal: 4, fontVariant: ['tabular-nums'] }}
                   accessibilityLabel={`Amount for ${p.name || `person ${i + 1}`}`}
                 />
               </View>
@@ -490,8 +490,8 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
 
 const st = StyleSheet.create({
   search: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderRadius: space.controlRadius + 2, paddingHorizontal: 14, minHeight: 52 },
-  searchInput: { flex: 1, fontSize: 16, fontFamily: font('body'), paddingVertical: 12 },
-  input: { borderWidth: 1.5, borderRadius: space.controlRadius, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, fontFamily: font('body'), minHeight: space.target },
+  searchInput: { flex: 1, alignSelf: 'stretch', fontSize: 16, fontFamily: font('body'), paddingVertical: 0 },
+  input: { borderWidth: 1.5, borderRadius: space.controlRadius, paddingHorizontal: 14, paddingVertical: 0, fontSize: 16, fontFamily: font('body'), minHeight: space.target },
   two: { flexDirection: 'row', gap: 10 },
   result: { borderRadius: space.cardRadius, paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18, gap: 2 },
   resultRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', borderTopWidth: 1, marginTop: 10, paddingTop: 12 },

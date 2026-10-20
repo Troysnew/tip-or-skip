@@ -155,7 +155,7 @@ function HolidayRow({ it, last, update, remove }: { it: HolidayItem; last: boole
             keyboardType="decimal-pad"
             placeholder="0"
             placeholderTextColor={c.muted}
-            style={{ flex: 1, color: c.ink, fontFamily: font('mono', 700), fontSize: 15, paddingVertical: 8, paddingHorizontal: 4 }}
+            style={{ flex: 1, color: c.ink, fontFamily: font('mono', 700), fontSize: 15, alignSelf: 'stretch', paddingVertical: 0, paddingHorizontal: 4 }}
             accessibilityLabel={`${giftOnly ? 'Gift budget' : 'Amount'} for ${it.who}`}
           />
         </View>
@@ -178,7 +178,7 @@ function HolidayRow({ it, last, update, remove }: { it: HolidayItem; last: boole
               keyboardType="decimal-pad"
               placeholder="0"
               placeholderTextColor={c.muted}
-              style={{ flex: 1, color: c.ink, fontFamily: font('mono'), fontSize: 15, paddingVertical: 8, paddingHorizontal: 4 }}
+              style={{ flex: 1, color: c.ink, fontFamily: font('mono'), fontSize: 15, alignSelf: 'stretch', paddingVertical: 0, paddingHorizontal: 4 }}
               accessibilityLabel={rec.ask}
             />
           </View>
@@ -240,7 +240,7 @@ const st = StyleSheet.create({
   counter: { flexDirection: 'row', gap: 8 },
   countBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   suggest: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, minHeight: 56 },
-  amount: { width: 92, flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 8 },
+  amount: { width: 92, minHeight: 38, flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 8 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  input: { flex: 1, borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9, fontSize: 15, fontFamily: font('body') },
+  input: { flex: 1, borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 0, minHeight: 42, fontSize: 15, fontFamily: font('body') },
 });

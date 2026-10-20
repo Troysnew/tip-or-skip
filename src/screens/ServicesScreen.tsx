@@ -72,6 +72,6 @@ export function ServicesScreen({ onOpenService, onRequest }: Props) {
 
 const st = StyleSheet.create({
   search: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 14, minHeight: 52 },
-  searchInput: { flex: 1, fontSize: 16, fontFamily: font('body'), paddingVertical: 12 },
+  searchInput: { flex: 1, alignSelf: 'stretch', fontSize: 16, fontFamily: font('body'), paddingVertical: 0 },
   guideHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 4 },
 });

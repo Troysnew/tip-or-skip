@@ -254,7 +254,7 @@ export function ReceiptScreen({ visible, people: startPeople, onClose, onUse }: 
                         keyboardType="numbers-and-punctuation"
                         placeholder="0.00"
                         placeholderTextColor={c.muted}
-                        style={{ flex: 1, color: c.ink, fontFamily: font('mono'), fontSize: 16, paddingVertical: 10, paddingHorizontal: 4, fontVariant: ['tabular-nums'] }}
+                        style={{ flex: 1, color: c.ink, fontFamily: font('mono'), fontSize: 16, alignSelf: 'stretch', paddingVertical: 0, paddingHorizontal: 4, fontVariant: ['tabular-nums'] }}
                         accessibilityLabel={`Price for ${it.name || 'item'}`}
                       />
                     </View>
@@ -357,7 +357,7 @@ const st = StyleSheet.create({
   row: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   two: { flexDirection: 'row', gap: 10 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  input: { borderWidth: 1.5, borderRadius: space.controlRadius, paddingHorizontal: 12, paddingVertical: 10, fontSize: 16, fontFamily: font('body'), minHeight: space.target },
+  input: { borderWidth: 1.5, borderRadius: space.controlRadius, paddingHorizontal: 12, paddingVertical: 0, fontSize: 16, fontFamily: font('body'), minHeight: space.target },
   price: { width: 108, minHeight: space.target, flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: space.controlRadius, paddingHorizontal: 10 },
   remove: { width: 40, height: space.target, alignItems: 'center', justifyContent: 'center' },
   removeDot: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
