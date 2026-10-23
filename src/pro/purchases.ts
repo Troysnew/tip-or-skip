@@ -8,7 +8,9 @@
  */
 
 export const TEST_MODE = true;
-export const PRO_PRICE = '$2.99';
+export const PRO_PRICE = '$4.99';
+/** Product ID in App Store Connect (non-consumable, Family Sharing on). */
+export const PRO_PRODUCT_ID = 'tiporskip.pro';
 export const PRO_ENTITLEMENT = 'pro';
 
 export async function buyPro(): Promise<boolean> {

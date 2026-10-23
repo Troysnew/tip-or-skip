@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, useColorScheme, View, Platform } from 'react-native';
 import { Text } from '../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Body, Btn } from '../components/ui';
@@ -52,7 +52,7 @@ export function Paywall() {
             <View style={{ gap: 4 }}>
               <Text style={[st.eyebrow, { color: c.accent }]}>{paywall ? `${paywall} is a Pro feature` : 'Upgrade'}</Text>
               <Text style={[st.title, { color: c.ink }]}>Unlock Pro</Text>
-              <Body muted>One payment of {PRO_PRICE}. No subscription.</Body>
+              <Body muted>One payment of {PRO_PRICE}. No subscription.{Platform.OS === 'ios' ? ' Family Sharing lets up to five family members use it too.' : ''}</Body>
             </View>
             <View style={{ gap: 12 }}>
               {FEATURES.map((f) => (

@@ -41,7 +41,7 @@ export function DataScreen() {
           </>
         ) : (
           <>
-            <Body>Tip history, saved presets, split by item, and the holiday planner. One payment of {PRO_PRICE}.</Body>
+            <Body>Receipt scan, split by item, payment requests, the holiday planner, tip history and saved presets. One payment of {PRO_PRICE}.</Body>
             <Btn small title="See Pro" onPress={() => openPaywall('')} />
           </>
         )}
