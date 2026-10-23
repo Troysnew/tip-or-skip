@@ -1,6 +1,7 @@
-import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { usePersistentState } from './lib/storage';
 import type { HistoryEntry, HolidayPlan, Polls, Preset } from './state';
+import { startPurchases } from './pro/purchases';
 import { allRequestApps, emptyHandles, type PayHandles, type RequestApps } from './lib/pay';
 
 interface Store {
@@ -33,7 +34,20 @@ interface Store {
 const Ctx = createContext<Store | null>(null);
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
-  const [pro, setPro] = usePersistentState<boolean>('tos.pro', false);
+  // Pro as last saved on this phone, and as the App Store reports it. The App Store wins once it answers.
+  const [savedPro, setSavedPro] = usePersistentState<boolean>('tos.pro', false);
+  const [storePro, setStorePro] = useState<boolean | null>(null);
+  useEffect(() => {
+    startPurchases((v) => {
+      setStorePro(v);
+      setSavedPro(v);
+    });
+  }, [setSavedPro]);
+  const pro = storePro ?? savedPro;
+  const setPro = useCallback((v: boolean) => {
+    setSavedPro(v);
+    setStorePro((s) => (s === null ? null : v));
+  }, [setSavedPro]);
   const [history, setHistory] = usePersistentState<HistoryEntry[]>('tos.history', []);
   const [presets, setPresets] = usePersistentState<Preset[]>('tos.presets', []);
   const [holiday, setHoliday] = usePersistentState<HolidayPlan>('tos.holiday', { year: new Date().getFullYear(), items: [] });

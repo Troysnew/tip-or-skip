@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Modal, Pressable, ScrollView, StyleSheet, useColorScheme, View, Platform } from 'react-native';
 import { Text } from '../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Body, Btn } from '../components/ui';
-import { buyPro, PRO_PRICE, restorePro, TEST_MODE } from '../pro/purchases';
+import { buyPro, PRO_PRICE, proPrice, restorePro, TEST_MODE, type PurchaseResult } from '../pro/purchases';
 import { useStore } from '../store';
 import { useColors } from '../theme';
 
@@ -22,15 +22,22 @@ export function Paywall() {
   const scheme = useColorScheme();
   const { paywall, closePaywall, setPro, flash } = useStore();
   const [busy, setBusy] = useState(false);
+  const [price, setPrice] = useState(PRO_PRICE);
+  useEffect(() => {
+    if (paywall !== null) proPrice().then(setPrice).catch(() => {});
+  }, [paywall]);
   if (paywall === null) return null;
 
-  const run = async (fn: () => Promise<boolean>, done: string) => {
+  const run = async (fn: () => Promise<PurchaseResult>, done: string) => {
     setBusy(true);
     try {
-      if (await fn()) {
+      const r = await fn();
+      if (r.ok) {
         setPro(true);
         closePaywall();
         flash(done);
+      } else if (r.message) {
+        flash(r.message);
       }
     } finally {
       setBusy(false);
@@ -52,7 +59,7 @@ export function Paywall() {
             <View style={{ gap: 4 }}>
               <Text style={[st.eyebrow, { color: c.accent }]}>{paywall ? `${paywall} is a Pro feature` : 'Upgrade'}</Text>
               <Text style={[st.title, { color: c.ink }]}>Unlock Pro</Text>
-              <Body muted>One payment of {PRO_PRICE}. No subscription.{Platform.OS === 'ios' ? ' Family Sharing lets up to five family members use it too.' : ''}</Body>
+              <Body muted>One payment of {price}. No subscription.{Platform.OS === 'ios' ? ' Family Sharing lets up to five family members use it too.' : ''}</Body>
             </View>
             <View style={{ gap: 12 }}>
               {FEATURES.map((f) => (
@@ -68,7 +75,7 @@ export function Paywall() {
                 </View>
               ))}
             </View>
-            <Btn title={busy ? 'Working…' : TEST_MODE ? `Unlock Pro (test mode)` : `Unlock Pro for ${PRO_PRICE}`} onPress={() => !busy && run(buyPro, 'Pro unlocked')} />
+            <Btn title={busy ? 'Working…' : TEST_MODE ? `Unlock Pro (test mode)` : `Unlock Pro for ${price}`} onPress={() => !busy && run(buyPro, 'Pro unlocked')} />
             {TEST_MODE && (
               <View style={[st.note, { backgroundColor: c.infoBg }]}>
                 <Text style={{ color: c.info, fontSize: 13 }}>Purchases aren't connected yet. This unlocks Pro on this phone only, so you can test the features. You can turn it back off from the About tab.</Text>
