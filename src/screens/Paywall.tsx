@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, useColorScheme, useWindowDimensions, View, Platform } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, useWindowDimensions, View, Platform } from 'react-native';
 import { Text } from '../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Body, Btn } from '../components/ui';
@@ -19,7 +19,6 @@ const FEATURES: { title: string; line: string; soon?: boolean }[] = [
 export function Paywall() {
   const c = useColors();
   const insets = useSafeAreaInsets();
-  const scheme = useColorScheme();
   // Exact size for the header art: a percentage width let iOS draw it at its full pixel size.
   const { width: screenW } = useWindowDimensions();
   const headerW = Math.min(screenW, 640) - 40;
@@ -60,7 +59,7 @@ export function Paywall() {
         <View style={[st.sheet, { backgroundColor: c.bg, paddingBottom: insets.bottom + 16 }]}>
           <ScrollView contentContainerStyle={{ gap: 14, padding: 20 }}>
             <Image
-              source={scheme === 'dark' ? require('../../assets/brand/paywall-header-dark.png') : require('../../assets/brand/paywall-header-light.png')}
+              source={require('../../assets/brand/paywall-header.png')}
               style={[st.header, { width: headerW, height: Math.round((headerW * 320) / 1024) }]}
               resizeMode="contain"
               accessibilityLabel="Tip or Skip Pro"
