@@ -60,7 +60,7 @@ export function DataScreen() {
         <Btn small ghost title={hasHandles(payHandles) ? 'Edit' : 'Add'} onPress={() => setEditingHandles(true)} />
       </Card>
       <HandlesSheet visible={editingHandles} onClose={() => setEditingHandles(false)} />
-      <Text style={{ color: c.muted, fontSize: 12 }}>Version 0.7.12</Text>
+      <Text style={{ color: c.muted, fontSize: 12 }}>Version 1.0.0</Text>
       <View style={{ gap: 4 }}>
         <H2>Where the numbers come from</H2>
         <Body muted>Stats appear only where a published survey measured that service. Everything else waits for in-app responses.</Body>
