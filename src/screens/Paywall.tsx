@@ -23,13 +23,19 @@ export function Paywall() {
   const { paywall, closePaywall, setPro, flash } = useStore();
   const [busy, setBusy] = useState(false);
   const [price, setPrice] = useState(PRO_PRICE);
+  // Shown on this screen: the app's toast sits behind the modal and can't be seen here.
+  const [error, setError] = useState<{ message: string; detail?: string } | null>(null);
   useEffect(() => {
-    if (paywall !== null) proPrice().then(setPrice).catch(() => {});
+    if (paywall !== null) {
+      setError(null);
+      proPrice().then(setPrice).catch(() => {});
+    }
   }, [paywall]);
   if (paywall === null) return null;
 
   const run = async (fn: () => Promise<PurchaseResult>, done: string) => {
     setBusy(true);
+    setError(null);
     try {
       const r = await fn();
       if (r.ok) {
@@ -37,7 +43,7 @@ export function Paywall() {
         closePaywall();
         flash(done);
       } else if (r.message) {
-        flash(r.message);
+        setError({ message: r.message, detail: r.detail });
       }
     } finally {
       setBusy(false);
@@ -75,6 +81,12 @@ export function Paywall() {
                 </View>
               ))}
             </View>
+            {error && (
+              <View style={[st.note, { backgroundColor: c.infoBg }]} accessibilityLiveRegion="polite">
+                <Text style={{ color: c.info, fontSize: 14, fontWeight: '600' }}>{error.message}</Text>
+                {error.detail ? <Text style={{ color: c.info, fontSize: 12, marginTop: 4 }} selectable>{error.detail}</Text> : null}
+              </View>
+            )}
             <Btn title={busy ? 'Working…' : TEST_MODE ? `Unlock Pro (test mode)` : `Unlock Pro for ${price}`} onPress={() => !busy && run(buyPro, 'Pro unlocked')} />
             {TEST_MODE && (
               <View style={[st.note, { backgroundColor: c.infoBg }]}>

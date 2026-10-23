@@ -58,19 +58,37 @@ export async function proPrice(): Promise<string> {
   }
 }
 
-export type PurchaseResult = { ok: true } | { ok: false; message?: string };
+export type PurchaseResult = { ok: true } | { ok: false; message?: string; detail?: string };
+
+/** The App Store or RevenueCat error, for the small print under a failure message. */
+function detailOf(e: unknown): string {
+  const err = e as { code?: string; message?: string; userInfo?: { readableErrorCode?: string }; readableErrorCode?: string; underlyingErrorMessage?: string };
+  const code = err?.userInfo?.readableErrorCode ?? err?.readableErrorCode ?? err?.code ?? '';
+  const msg = err?.underlyingErrorMessage || err?.message || '';
+  return [code, msg].filter(Boolean).join(': ').slice(0, 300);
+}
+
+/** Configuration problems (products not set up or agreements not active) read differently from network problems. */
+function failure(e: unknown): PurchaseResult {
+  const detail = detailOf(e);
+  if (/CONFIGURATION|PRODUCT_NOT_AVAILABLE|could not be fetched|offerings/i.test(detail)) {
+    return { ok: false, message: "Pro isn't available from the App Store yet.", detail };
+  }
+  return { ok: false, message: "Couldn't complete the purchase. Check your connection and try again.", detail };
+}
 
 /** Buy Pro. A cancelled purchase is not an error: it returns ok false with no message. */
 export async function buyPro(): Promise<PurchaseResult> {
   if (TEST_MODE) return { ok: true };
+  if (!started) return { ok: false, message: "Purchases didn't start on this phone. Close and reopen the app, then try again." };
   try {
     const pkg = await proPackage();
-    if (!pkg) return { ok: false, message: "Pro isn't available right now. Try again later." };
+    if (!pkg) return { ok: false, message: "Pro isn't available from the App Store yet.", detail: 'No package in the current offering' };
     const { customerInfo } = await Purchases.purchasePackage(pkg);
     return hasPro(customerInfo) ? { ok: true } : { ok: false, message: "The purchase didn't finish. You weren't charged for Pro." };
   } catch (e) {
     if ((e as { userCancelled?: boolean | null })?.userCancelled) return { ok: false };
-    return { ok: false, message: "Couldn't reach the App Store. Check your connection and try again." };
+    return failure(e);
   }
 }
 
@@ -80,7 +98,7 @@ export async function restorePro(): Promise<PurchaseResult> {
   try {
     const info = await Purchases.restorePurchases();
     return hasPro(info) ? { ok: true } : { ok: false, message: 'No Pro purchase was found for this Apple ID.' };
-  } catch {
-    return { ok: false, message: "Couldn't reach the App Store. Check your connection and try again." };
+  } catch (e) {
+    return failure(e);
   }
 }
