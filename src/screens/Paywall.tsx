@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, useColorScheme, View, Platform } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, useColorScheme, useWindowDimensions, View, Platform } from 'react-native';
 import { Text } from '../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Body, Btn } from '../components/ui';
@@ -20,6 +20,9 @@ export function Paywall() {
   const c = useColors();
   const insets = useSafeAreaInsets();
   const scheme = useColorScheme();
+  // Exact size for the header art: a percentage width let iOS draw it at its full pixel size.
+  const { width: screenW } = useWindowDimensions();
+  const headerW = Math.min(screenW, 640) - 40;
   const { paywall, closePaywall, setPro, flash } = useStore();
   const [busy, setBusy] = useState(false);
   const [price, setPrice] = useState(PRO_PRICE);
@@ -58,7 +61,7 @@ export function Paywall() {
           <ScrollView contentContainerStyle={{ gap: 14, padding: 20 }}>
             <Image
               source={scheme === 'dark' ? require('../../assets/brand/paywall-header-dark.png') : require('../../assets/brand/paywall-header-light.png')}
-              style={st.header}
+              style={[st.header, { width: headerW, height: Math.round((headerW * 320) / 1024) }]}
               resizeMode="contain"
               accessibilityLabel="Tip or Skip Pro"
             />
@@ -108,7 +111,7 @@ const st = StyleSheet.create({
   wrap: { flex: 1, justifyContent: 'flex-end' },
   sheet: { maxHeight: '92%', borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   eyebrow: { fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.8 },
-  header: { width: '100%', aspectRatio: 1024 / 320, borderRadius: 16 },
+  header: { borderRadius: 16, alignSelf: 'center' },
   title: { fontFamily: 'display', fontSize: 28, fontWeight: '800', letterSpacing: -0.5 },
   feature: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   note: { borderRadius: 10, padding: 12 },
