@@ -10,6 +10,7 @@ import { cleanHandle, HANDLE_APPS, hasHandles, openPayApp, PAY_APPS, pickHandles
 import { money } from '../lib/tip';
 import { useProGate, useStore } from '../store';
 import { mono, space, useColors } from '../theme';
+import { DoneBar, dismissOnDrag } from '../components/DoneBar';
 
 function Sheet({ visible, onClose, title, children }: { visible: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
   const c = useColors();
@@ -25,11 +26,12 @@ function Sheet({ visible, onClose, title, children }: { visible: boolean; onClos
               <Text style={{ color: c.accent, fontWeight: '600', fontSize: 16 }}>Close</Text>
             </Pressable>
           </View>
-          <ScrollView contentContainerStyle={{ gap: 12, paddingHorizontal: space.screen, paddingBottom: 8 }} keyboardShouldPersistTaps="handled">
+          <ScrollView contentContainerStyle={{ gap: 12, paddingHorizontal: space.screen, paddingBottom: 8 }} keyboardShouldPersistTaps="handled" keyboardDismissMode={dismissOnDrag}>
             {children}
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
+      <DoneBar />
     </Modal>
   );
 }

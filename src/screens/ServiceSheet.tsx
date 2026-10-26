@@ -9,6 +9,7 @@ import { canCalculate, computePct, defaultOption, money, normLabel, optionLabel,
 import type { CalcState } from '../state';
 import { useStore } from '../store';
 import { mono, useColors, verdictColors } from '../theme';
+import { DoneBar, dismissOnDrag } from '../components/DoneBar';
 
 interface Props {
   serviceId: string | null;
@@ -65,7 +66,7 @@ export function ServiceSheet({ serviceId, onClose, calc, setBill, onSendToCalcul
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={st.wrap} pointerEvents="box-none">
         <View style={[st.sheet, { backgroundColor: c.bg, paddingBottom: insets.bottom + 16 }]}>
           <View style={[st.grab, { backgroundColor: c.line }]} />
-          <ScrollView contentContainerStyle={{ gap: 14, paddingHorizontal: 16, paddingBottom: 8 }} keyboardShouldPersistTaps="handled">
+          <ScrollView contentContainerStyle={{ gap: 14, paddingHorizontal: 16, paddingBottom: 8 }} keyboardShouldPersistTaps="handled" keyboardDismissMode={dismissOnDrag}>
             <View style={st.head}>
               <View style={{ flex: 1 }}>
                 <Text style={[st.eyebrow, { color: c.muted }]}>{s.category}</Text>
@@ -93,7 +94,7 @@ export function ServiceSheet({ serviceId, onClose, calc, setBill, onSendToCalcul
                 ) : (
                   <View style={{ flexDirection: 'row', gap: 12 }}>
                     <MoneyField label="Bill total" value={calc.bill} onChange={(v) => setBill(v, calc.tax)} />
-                    <MoneyField label="Tax (optional)" value={calc.tax} onChange={(v) => setBill(calc.bill, v)} />
+                    <MoneyField label="Tax on receipt" value={calc.tax} onChange={(v) => setBill(calc.bill, v)} />
                   </View>
                 )}
                 <TipButtons options={options} selected={choice} onSelect={setChoice} />
@@ -112,7 +113,7 @@ export function ServiceSheet({ serviceId, onClose, calc, setBill, onSendToCalcul
                     <Text style={{ color: c.muted }}>Enter the bill to see your tip</Text>
                   )}
                 </View>
-                {!s.flat && <Body muted small>{tax > 0 ? `Tip figured on ${money(baseAmt)}, the amount before tax.` : 'Add the tax to tip on the pre-tax amount.'}</Body>}
+                {!s.flat && <Body muted small>{tax > 0 ? `Tip figured on ${money(baseAmt)}, the bill before tax.` : 'Tipping guides figure the tip before tax. Enter the tax from your receipt to leave it out, or leave it blank.'}</Body>}
               </Card>
             )}
 
@@ -178,6 +179,7 @@ export function ServiceSheet({ serviceId, onClose, calc, setBill, onSendToCalcul
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
+      <DoneBar />
     </Modal>
   );
 }

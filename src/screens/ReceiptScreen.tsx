@@ -12,6 +12,7 @@ import { parseReceipt, toSplit, type ScanItem, type ScanPerson } from '../lib/re
 import { money } from '../lib/tip';
 import { newId } from '../state';
 import { mono, space, useColors } from '../theme';
+import { DoneBar, dismissOnDrag } from '../components/DoneBar';
 
 export type SplitFromReceipt = ReturnType<typeof toSplit>;
 
@@ -196,7 +197,7 @@ export function ReceiptScreen({ visible, people: startPeople, onClose, onUse }: 
 
         {phase === 'review' && (
           <>
-            <ScrollView contentContainerStyle={[st.body, { paddingBottom: 24 }]} keyboardShouldPersistTaps="handled">
+            <ScrollView contentContainerStyle={[st.body, { paddingBottom: 24 }]} keyboardShouldPersistTaps="handled" keyboardDismissMode={dismissOnDrag}>
               <View style={[st.note, { backgroundColor: check.ok === false ? c.maybeBg : check.ok ? c.yesBg : c.infoBg }]}>
                 <Text style={{ color: check.ok === false ? c.maybe : check.ok ? c.yes : c.info, fontSize: 14, lineHeight: 20 }}>
                   {check.ok === null
@@ -308,6 +309,7 @@ export function ReceiptScreen({ visible, people: startPeople, onClose, onUse }: 
           </>
         )}
       </KeyboardAvoidingView>
+      <DoneBar />
     </Modal>
   );
 }

@@ -276,7 +276,7 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
         </>
       ) : (
         <>
-          <BigMoneyField label="Bill amount" value={state.bill} onChange={(v) => patch({ bill: v })} />
+          <BigMoneyField label="Bill total" value={state.bill} onChange={(v) => patch({ bill: v })} />
           <Pressable
             onPress={() => gate('Receipt scan', () => (canScanReceipts ? setScanning(true) : flash('Update the app to scan receipts')))}
             accessibilityRole="button"
@@ -445,8 +445,15 @@ export function CalculatorScreen({ state, setState, onOpenService }: Props) {
       <Card style={{ gap: 14 }}>
         {!flat && (
           <>
-            <MoneyField label="Tax on the bill (optional)" value={state.tax} onChange={(v) => patch({ tax: v })} />
-            <Segmented<TipBase> label="Tip on" value={state.base} onChange={(v) => patch({ base: v })} options={[{ v: 'pre', t: 'Pre-tax amount' }, { v: 'post', t: 'Full bill' }]} />
+            <MoneyField label="Tax on receipt (optional)" value={state.tax} onChange={(v) => patch({ tax: v })} />
+            <Segmented<TipBase> label="Figure the tip on" value={state.base} onChange={(v) => patch({ base: v })} options={[{ v: 'pre', t: 'Bill before tax' }, { v: 'post', t: 'Total with tax' }]} />
+            <Text style={{ color: c.muted, fontSize: 14, lineHeight: 20 }}>
+              {tax > 0
+                ? state.base === 'pre'
+                  ? `Tip figured on ${money(pctResult.baseAmt)}, the bill before tax.`
+                  : `Tip figured on the full ${money(bill)}, tax included.`
+                : 'Tipping guides figure the tip before tax. Enter the tax from your receipt to leave it out, or leave it blank to tip on the total.'}
+            </Text>
           </>
         )}
         <Segmented<RoundMode> label="Round up" value={state.round} onChange={(v) => patch({ round: v })} options={[{ v: 'none', t: 'Off' }, { v: 'tip', t: 'Tip' }, { v: 'total', t: 'Total' }]} />

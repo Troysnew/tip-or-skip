@@ -10,6 +10,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import type { Service } from './src/data/services';
 import { CalculatorScreen } from './src/screens/CalculatorScreen';
 import { DataScreen } from './src/screens/DataScreen';
+import { DoneBar, dismissOnDrag } from './src/components/DoneBar';
 import { HistoryScreen } from './src/screens/HistoryScreen';
 import { HolidayScreen } from './src/screens/HolidayScreen';
 import { Paywall } from './src/screens/Paywall';
@@ -68,6 +69,7 @@ function Main() {
       <StatusBar style="auto" />
       <ScrollView
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={dismissOnDrag}
         contentContainerStyle={{ paddingHorizontal: Math.max(space.screen, insets.left, insets.right), paddingTop: 12, paddingBottom: 32, gap: 18 }}
       >
         <View style={st.appBar} accessibilityRole="header" accessibilityLabel="Tip or Skip">
@@ -92,6 +94,7 @@ function Main() {
         {tab === 'about' && <DataScreen />}
       </ScrollView>
 
+      <DoneBar />
       {toast && (
         <View style={[st.toast, { backgroundColor: c.ink, bottom: 80 + insets.bottom }]} pointerEvents="none">
           <Text style={{ color: c.bg, fontWeight: '600' }}>{toast}</Text>
